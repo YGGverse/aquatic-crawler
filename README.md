@@ -12,7 +12,7 @@ Crawler/aggregation tool for the [Aquatic](https://github.com/greatest-ape/aquat
 ## Roadmap
 
 * Targets supported
-    * [x] IPv4/IPv6 info-hash JSON/API (see [PR#233](https://github.com/greatest-ape/aquatic/pull/233))
+    * [x] IPv4/IPv6 info-hash JSON/API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233))
         * [x] local file path
         * [ ] remote URL
 * Storage
