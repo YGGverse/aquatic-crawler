@@ -28,9 +28,9 @@ pub struct Argument {
     #[arg(long)]
     pub torrent_tracker: Vec<String>,
 
-    /// Disable DHT resolver (useful with `torrent_tracker`)
+    /// Enable DHT resolver
     #[arg(long, default_value_t = false)]
-    pub disable_dht: bool,
+    pub enable_dht: bool,
 
     /// Enable UPnP
     #[arg(long, default_value_t = false)]

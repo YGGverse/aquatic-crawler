@@ -65,8 +65,8 @@ aquatic-crawler --infohash-source /path/to/info-hash-ipv4.json\
       --torrent-tracker <TORRENT_TRACKER>
           Define custom tracker(s) to preload the `.torrent` files info
 
-      --disable-dht
-          Disable DHT resolver (useful with `torrent_tracker`)
+      --enable_dht-dht
+          Enable DHT
 
       --enable-upnp-port-forwarding
           Enable UPnP

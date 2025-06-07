@@ -44,7 +44,7 @@ async fn main() -> anyhow::Result<()> {
         let session = librqbit::Session::new_with_opts(
             std::path::PathBuf::new(),
             SessionOptions {
-                disable_dht: argument.disable_dht,
+                disable_dht: !argument.enable_dht,
                 disable_upload: !argument.enable_upload,
                 enable_upnp_port_forwarding: argument.enable_upnp_port_forwarding,
                 socks_proxy_url: argument.socks_proxy_url.clone(),
