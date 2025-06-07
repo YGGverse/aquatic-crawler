@@ -1,6 +1,6 @@
 # aquatic-crawler
 
-![Linux](https://github.com/YGGverse/aquatic-crawler/actions/workflows/linux.yml/badge.svg)
+![Build](https://github.com/YGGverse/aquatic-crawler/actions/workflows/build.yml/badge.svg)
 [![Dependencies](https://deps.rs/repo/github/YGGverse/aquatic-crawler/status.svg)](https://deps.rs/repo/github/YGGverse/aquatic-crawler)
 [![crates.io](https://img.shields.io/crates/v/aquatic-crawler.svg)](https://crates.io/crates/aquatic-crawler)
 
