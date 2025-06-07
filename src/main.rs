@@ -71,6 +71,9 @@ async fn main() -> anyhow::Result<()> {
                     total += infohashes.len();
                     for i in infohashes {
                         if torrent_storage.as_ref().is_some_and(|s| !s.exists(&i)) {
+                            if is_debug_i {
+                                debug::info(format!("Resolve `{i}`..."));
+                            }
                             match session
                                 .add_torrent(
                                     librqbit::AddTorrent::from_url(format!(
