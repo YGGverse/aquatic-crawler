@@ -32,7 +32,19 @@ pub struct Argument {
     #[arg(long, default_value_t = false)]
     pub disable_dht: bool,
 
+    /// Enable UPnP
+    #[arg(long, default_value_t = false)]
+    pub enable_upnp_port_forwarding: bool,
+
+    /// Enable upload
+    #[arg(long, default_value_t = false)]
+    pub enable_upload: bool,
+
+    /// Use `socks5://[username:password@]host:port`
+    #[arg(long)]
+    pub socks_proxy_url: Option<String>,
+
     /// Crawl loop delay in seconds
-    #[arg(short, long, default_value_t = 300)]
+    #[arg(short, default_value_t = 300)]
     pub sleep: u64,
 }

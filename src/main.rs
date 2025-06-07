@@ -45,6 +45,9 @@ async fn main() -> anyhow::Result<()> {
             std::path::PathBuf::new(),
             SessionOptions {
                 disable_dht: argument.disable_dht,
+                disable_upload: !argument.enable_upload,
+                enable_upnp_port_forwarding: argument.enable_upnp_port_forwarding,
+                socks_proxy_url: argument.socks_proxy_url.clone(),
                 trackers: trackers.clone(),
                 ..SessionOptions::default()
             },

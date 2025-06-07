@@ -67,7 +67,16 @@ Options:
       --disable-dht
           Disable DHT resolver (useful with `torrent_tracker`)
 
-  -s, --sleep <SLEEP>
+      --enable-upnp-port-forwarding
+          Enable UPnP
+
+      --enable-upload
+          Enable upload
+
+      --socks-proxy-url <SOCKS_PROXY_URL>
+          Use `socks5://[username:password@]host:port`
+
+  -s <SLEEP>
           Crawl loop delay in seconds
 
           [default: 300]
