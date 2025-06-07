@@ -31,8 +31,8 @@ async fn main() -> anyhow::Result<()> {
         trackers.insert(url::Url::from_str(&tracker)?);
     }
 
-    let mut peers = Vec::with_capacity(argument.initial_peers.len());
-    for peer in argument.initial_peers {
+    let mut peers = Vec::with_capacity(argument.initial_peer.len());
+    for peer in argument.initial_peer {
         peers.push(std::net::SocketAddr::from_str(&peer)?);
     }
 

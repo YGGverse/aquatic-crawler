@@ -65,7 +65,7 @@ aquatic-crawler --infohash-source /path/to/info-hash-ipv4.json\
 --torrent-tracker <TORRENT_TRACKER>
         Define custom tracker(s) to preload the `.torrent` files info
 
---initial-peers <INITIAL_PEERS>
+--initial-peer <INITIAL_PEER>
         Define initial peer(s) to preload the `.torrent` files info
 
 --enable-dht

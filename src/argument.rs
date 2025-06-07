@@ -30,7 +30,7 @@ pub struct Argument {
 
     /// Define initial peer(s) to preload the `.torrent` files info
     #[arg(long)]
-    pub initial_peers: Vec<String>,
+    pub initial_peer: Vec<String>,
 
     /// Enable DHT resolver
     #[arg(long, default_value_t = false)]
