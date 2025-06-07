@@ -40,7 +40,7 @@ aquatic-crawler --infohash-source /path/to/info-hash-ipv4.json\
                 --torrents-path   /path/to/storage
 ```
 * all arguments are optional, to support multiple source and target drivers
-  running without arguments does nothing!
+* running without arguments does nothing!
 
 ### Options
 
