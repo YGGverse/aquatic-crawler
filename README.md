@@ -43,7 +43,6 @@ aquatic-crawler --infohash-source /path/to/info-hash-ipv4.json\
 ### Options
 
 ``` bash
-Options:
   -d, --debug <DEBUG>
           Debug level
 
