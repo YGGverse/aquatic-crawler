@@ -16,7 +16,7 @@ async fn main() -> anyhow::Result<()> {
     let is_debug_e = argument.debug.contains("e");
 
     // init shared members
-    let torrent_storage = if let Some(t) = argument.torrents_path {
+    let torrent_storage = if let Some(t) = argument.storage {
         let s = database::torrent::Storage::init(&t, argument.clear)?;
         if argument.clear && is_debug_i {
             debug::info(String::from("Cleanup torrent storage"));
@@ -59,7 +59,7 @@ async fn main() -> anyhow::Result<()> {
         )
         .await?;
         // collect info-hashes from API
-        for source in &argument.infohash_source {
+        for source in &argument.infohash_file {
             if is_debug_i {
                 debug::info(format!("Handle info-hash source `{source}`..."));
             }

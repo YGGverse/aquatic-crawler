@@ -31,12 +31,12 @@ Crawler/aggregation tool for the [Aquatic](https://github.com/greatest-ape/aquat
 ## Usage
 
 ``` bash
-aquatic-crawler --infohash-source /path/to/info-hash-ipv4.json\
-                --infohash-source /path/to/info-hash-ipv6.json\
-                --infohash-source /path/to/another-source.json\
+aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
+                --infohash-file   /path/to/info-hash-ipv6.json\
+                --infohash-file   /path/to/another-source.json\
                 --torrent-tracker udp://host1:port\
                 --torrent-tracker udp://host2:port\
-                --torrents-path   /path/to/storage
+                --storage         /path/to/storage
 ```
 * all arguments are optional, to support multiple source and target drivers
 * running without arguments does nothing!
@@ -54,13 +54,13 @@ aquatic-crawler --infohash-source /path/to/info-hash-ipv4.json\
 -c, --clear
         Clear previous index collected on crawl session start
 
--i, --infohash-source <INFOHASH_SOURCE>
-        Filepath(s) to the Aquatic tracker info-hash JSON/API
+--infohash-file <INFOHASH_FILE>
+        Absolute filename(s) to the Aquatic tracker info-hash JSON/API
 
         * PR#233 feature
 
---torrents-path <TORRENTS_PATH>
-        Directory path to store the `.torrent` files
+--storage <STORAGE>
+        Directory path to store reload data (e.g. `.torrent` files)
 
 --torrent-tracker <TORRENT_TRACKER>
         Define custom tracker(s) to preload the `.torrent` files info

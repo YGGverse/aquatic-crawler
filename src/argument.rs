@@ -14,15 +14,15 @@ pub struct Argument {
     #[arg(short, long, default_value_t = false)]
     pub clear: bool,
 
-    /// Filepath(s) to the Aquatic tracker info-hash JSON/API
+    /// Absolute filename(s) to the Aquatic tracker info-hash JSON/API
     ///
     /// * PR#233 feature
-    #[arg(short, long)]
-    pub infohash_source: Vec<String>,
-
-    /// Directory path to store the `.torrent` files
     #[arg(long)]
-    pub torrents_path: Option<String>,
+    pub infohash_file: Vec<String>,
+
+    /// Directory path to store reload data (e.g. `.torrent` files)
+    #[arg(long)]
+    pub storage: Option<String>,
 
     /// Define custom tracker(s) to preload the `.torrent` files info
     #[arg(long)]
