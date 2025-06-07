@@ -47,7 +47,7 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 -d, --debug <DEBUG>
         Debug level
 
-        * `e` - error * `i` - info
+        * `e` - error * `i` - info * `t` - trace (e.g. to run with `RUST_LOG=librqbit=trace`)
 
         [default: ei]
 

@@ -7,6 +7,7 @@ pub struct Argument {
     ///
     /// * `e` - error
     /// * `i` - info
+    /// * `t` - trace (e.g. to run with `RUST_LOG=librqbit=trace`)
     #[arg(short, long, default_value_t = String::from("ei"))]
     pub debug: String,
 

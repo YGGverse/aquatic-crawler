@@ -15,6 +15,10 @@ async fn main() -> anyhow::Result<()> {
     let is_debug_i = argument.debug.contains("i");
     let is_debug_e = argument.debug.contains("e");
 
+    if argument.debug.contains("t") {
+        tracing_subscriber::fmt::init()
+    }
+
     // init shared members
     let torrent_storage = if let Some(t) = argument.storage {
         let s = database::torrent::Storage::init(&t, argument.clear)?;
@@ -49,10 +53,10 @@ async fn main() -> anyhow::Result<()> {
         let session = librqbit::Session::new_with_opts(
             std::path::PathBuf::new(),
             SessionOptions {
-                persistence: None,
                 disable_dht: !argument.enable_dht,
                 disable_upload: !argument.enable_upload,
                 enable_upnp_port_forwarding: argument.enable_upnp_port_forwarding,
+                persistence: None,
                 socks_proxy_url: argument.socks_proxy_url.clone(),
                 trackers: trackers.clone(),
                 ..SessionOptions::default()
