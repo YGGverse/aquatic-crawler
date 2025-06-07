@@ -21,9 +21,6 @@ Crawler/aggregation tool for the [Aquatic](https://github.com/greatest-ape/aquat
         * [ ] V2
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search
     * [ ] SQLite
-* Tools
-    * [ ] Storage cleaner
-    * [ ] Implement tests
 
 ## Install
 
@@ -53,11 +50,22 @@ Options:
 
           [default: ei]
 
-  -i, --infohash-source <INFOHASH_SOURCE>
-          Filepath(s) to the Aquatic tracker info-hash JSON/API (PR#233)
+  -c, --clear
+          Clear previous index collected on crawl session start
 
-  -t, --torrents-path <TORRENTS_PATH>
+  -i, --infohash-source <INFOHASH_SOURCE>
+          Filepath(s) to the Aquatic tracker info-hash JSON/API
+
+          * PR#233 feature
+
+      --torrents-path <TORRENTS_PATH>
           Directory path to store the `.torrent` files
+
+      --torrent-tracker <TORRENT_TRACKER>
+          Define custom tracker(s) to preload the `.torrent` files info
+
+      --disable-dht
+          Disable DHT resolver (useful with `torrent_tracker`)
 
   -s, --sleep <SLEEP>
           Crawl loop delay in seconds

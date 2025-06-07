@@ -10,15 +10,27 @@ pub struct Argument {
     #[arg(short, long, default_value_t = String::from("ei"))]
     pub debug: String,
 
+    /// Clear previous index collected on crawl session start
+    #[arg(short, long, default_value_t = false)]
+    pub clear: bool,
+
     /// Filepath(s) to the Aquatic tracker info-hash JSON/API
     ///
-    /// * PR #233 info-hash table implementation has multiple source tables for IPv4 and IPv6
+    /// * PR#233 feature
     #[arg(short, long)]
     pub infohash_source: Vec<String>,
 
     /// Directory path to store the `.torrent` files
-    #[arg(short, long)]
+    #[arg(long)]
     pub torrents_path: Option<String>,
+
+    /// Define custom tracker(s) to preload the `.torrent` files info
+    #[arg(long)]
+    pub torrent_tracker: Vec<String>,
+
+    /// Disable DHT resolver (useful with `torrent_tracker`)
+    #[arg(long, default_value_t = false)]
+    pub disable_dht: bool,
 
     /// Crawl loop delay in seconds
     #[arg(short, long, default_value_t = 300)]

@@ -4,12 +4,17 @@ use std::{fs, io::Write, path::PathBuf, str::FromStr};
 pub struct Storage(PathBuf);
 
 impl Storage {
-    pub fn init(storage: &str) -> Result<Self> {
+    pub fn init(storage: &str, clear: bool) -> Result<Self> {
         let p = PathBuf::from_str(storage)?;
-        if fs::metadata(&p).is_ok_and(|t| t.is_file()) {
-            bail!("Target destination is not directory!")
+        if let Ok(t) = fs::metadata(&p) {
+            if t.is_file() {
+                bail!("Target destination is not directory!")
+            }
+            if t.is_dir() && clear {
+                fs::remove_dir_all(&p)?;
+            }
         }
-        fs::create_dir_all(storage)?;
+        fs::create_dir_all(&p)?;
         Ok(Self(p))
     }
 

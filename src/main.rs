@@ -6,6 +6,9 @@ mod debug;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     use clap::Parser;
+    use librqbit::SessionOptions;
+    use std::str::FromStr;
+
     let argument = argument::Argument::parse();
 
     // calculate debug level once
@@ -14,11 +17,21 @@ async fn main() -> anyhow::Result<()> {
 
     // init shared members
     let torrent_storage = if let Some(t) = argument.torrents_path {
-        Some(database::torrent::Storage::init(&t)?)
+        let s = database::torrent::Storage::init(&t, argument.clear)?;
+        if argument.clear && is_debug_i {
+            debug::info(String::from("Cleanup torrent storage"));
+        }
+        Some(s)
     } else {
         None
     };
 
+    let mut trackers = std::collections::HashSet::with_capacity(argument.torrent_tracker.len());
+    for tracker in argument.torrent_tracker {
+        trackers.insert(url::Url::from_str(&tracker)?);
+    }
+
+    // begin
     if is_debug_i {
         debug::info(String::from("Crawler started"));
     }
@@ -28,7 +41,15 @@ async fn main() -> anyhow::Result<()> {
             debug::info(String::from("New index session begin..."));
         }
         let mut total = 0;
-        let session = librqbit::Session::new(std::path::PathBuf::new()).await?;
+        let session = librqbit::Session::new_with_opts(
+            std::path::PathBuf::new(),
+            SessionOptions {
+                disable_dht: argument.disable_dht,
+                trackers: trackers.clone(),
+                ..SessionOptions::default()
+            },
+        )
+        .await?;
         // collect info-hashes from API
         for source in &argument.infohash_source {
             if is_debug_i {
