@@ -1,8 +1,10 @@
+use std::time::{SystemTime, UNIX_EPOCH};
+
 pub fn error(e: &anyhow::Error) {
     eprintln!(
         "[{}] [error] {e}",
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_millis()
     )
@@ -11,8 +13,8 @@ pub fn error(e: &anyhow::Error) {
 pub fn info(message: String) {
     eprintln!(
         "[{}] [info] {message}",
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_millis()
     )
