@@ -34,7 +34,8 @@ Crawler/aggregation tool for the [Aquatic](https://github.com/greatest-ape/aquat
 aquatic-crawler --infohash-source /path/to/info-hash-ipv4.json\
                 --infohash-source /path/to/info-hash-ipv6.json\
                 --infohash-source /path/to/another-source.json\
-                --torrent-tracker udp://host:port\
+                --torrent-tracker udp://host1:port\
+                --torrent-tracker udp://host2:port\
                 --torrents-path   /path/to/storage
 ```
 * all arguments are optional, to support multiple source and target drivers
