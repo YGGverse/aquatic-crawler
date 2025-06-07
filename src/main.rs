@@ -55,9 +55,7 @@ async fn main() -> anyhow::Result<()> {
             SessionOptions {
                 disable_dht: !argument.enable_dht,
                 disable_upload: !argument.enable_upload,
-                enable_upnp_port_forwarding: argument.enable_upnp_port_forwarding,
                 persistence: None,
-                socks_proxy_url: argument.socks_proxy_url.clone(),
                 trackers: trackers.clone(),
                 ..SessionOptions::default()
             },

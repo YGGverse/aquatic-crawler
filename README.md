@@ -71,14 +71,8 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 --enable-dht
         Enable DHT resolver
 
---enable-upnp-port-forwarding
-        Enable UPnP
-
 --enable-upload
         Enable upload
-
---socks-proxy-url <SOCKS_PROXY_URL>
-        Use `socks5://[username:password@]host:port`
 
 -s <SLEEP>
         Crawl loop delay in seconds
