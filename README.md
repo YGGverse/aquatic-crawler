@@ -17,8 +17,8 @@ Crawler/aggregation tool for the [Aquatic](https://github.com/greatest-ape/aquat
         * [ ] remote URL
 * Storage
     * [x] File system (dump as `.torrent`)
-        [x] V1
-        [ ] V2
+        * [x] V1
+        * [ ] V2
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search
     * [ ] SQLite
 * Tools
