@@ -44,47 +44,50 @@ aquatic-crawler --infohash-source /path/to/info-hash-ipv4.json\
 ### Options
 
 ``` bash
-  -d, --debug <DEBUG>
-          Debug level
+-d, --debug <DEBUG>
+        Debug level
 
-          * `e` - error * `i` - info
+        * `e` - error * `i` - info
 
-          [default: ei]
+        [default: ei]
 
-  -c, --clear
-          Clear previous index collected on crawl session start
+-c, --clear
+        Clear previous index collected on crawl session start
 
-  -i, --infohash-source <INFOHASH_SOURCE>
-          Filepath(s) to the Aquatic tracker info-hash JSON/API
+-i, --infohash-source <INFOHASH_SOURCE>
+        Filepath(s) to the Aquatic tracker info-hash JSON/API
 
-          * PR#233 feature
+        * PR#233 feature
 
-      --torrents-path <TORRENTS_PATH>
-          Directory path to store the `.torrent` files
+--torrents-path <TORRENTS_PATH>
+        Directory path to store the `.torrent` files
 
-      --torrent-tracker <TORRENT_TRACKER>
-          Define custom tracker(s) to preload the `.torrent` files info
+--torrent-tracker <TORRENT_TRACKER>
+        Define custom tracker(s) to preload the `.torrent` files info
 
-      --enable_dht-dht
-          Enable DHT
+--initial-peers <INITIAL_PEERS>
+        Define initial peer(s) to preload the `.torrent` files info
 
-      --enable-upnp-port-forwarding
-          Enable UPnP
+--enable-dht
+        Enable DHT resolver
 
-      --enable-upload
-          Enable upload
+--enable-upnp-port-forwarding
+        Enable UPnP
 
-      --socks-proxy-url <SOCKS_PROXY_URL>
-          Use `socks5://[username:password@]host:port`
+--enable-upload
+        Enable upload
 
-  -s <SLEEP>
-          Crawl loop delay in seconds
+--socks-proxy-url <SOCKS_PROXY_URL>
+        Use `socks5://[username:password@]host:port`
 
-          [default: 300]
+-s <SLEEP>
+        Crawl loop delay in seconds
 
-  -h, --help
-          Print help (see a summary with '-h')
+        [default: 300]
 
-  -V, --version
-          Print version
+-h, --help
+        Print help (see a summary with '-h')
+
+-V, --version
+        Print version
 ```

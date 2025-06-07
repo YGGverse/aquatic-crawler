@@ -28,6 +28,10 @@ pub struct Argument {
     #[arg(long)]
     pub torrent_tracker: Vec<String>,
 
+    /// Define initial peer(s) to preload the `.torrent` files info
+    #[arg(long)]
+    pub initial_peers: Vec<String>,
+
     /// Enable DHT resolver
     #[arg(long, default_value_t = false)]
     pub enable_dht: bool,

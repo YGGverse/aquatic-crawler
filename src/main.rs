@@ -31,6 +31,11 @@ async fn main() -> anyhow::Result<()> {
         trackers.insert(url::Url::from_str(&tracker)?);
     }
 
+    let mut peers = Vec::with_capacity(argument.initial_peers.len());
+    for peer in argument.initial_peers {
+        peers.push(std::net::SocketAddr::from_str(&peer)?);
+    }
+
     // begin
     if is_debug_i {
         debug::info(String::from("Crawler started"));
@@ -72,6 +77,12 @@ async fn main() -> anyhow::Result<()> {
                                         "magnet:?xt=urn:btih:{i}"
                                     )),
                                     Some(librqbit::AddTorrentOptions {
+                                        disable_trackers: trackers.is_empty(),
+                                        initial_peers: if peers.is_empty() {
+                                            None
+                                        } else {
+                                            Some(peers.clone())
+                                        },
                                         list_only: true,
                                         ..Default::default()
                                     }),
