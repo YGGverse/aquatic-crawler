@@ -49,6 +49,7 @@ async fn main() -> anyhow::Result<()> {
         let session = librqbit::Session::new_with_opts(
             std::path::PathBuf::new(),
             SessionOptions {
+                persistence: None,
                 disable_dht: !argument.enable_dht,
                 disable_upload: !argument.enable_upload,
                 enable_upnp_port_forwarding: argument.enable_upnp_port_forwarding,
