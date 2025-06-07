@@ -4,7 +4,7 @@
 [![Dependencies](https://deps.rs/repo/github/YGGverse/aquatic-crawler/status.svg)](https://deps.rs/repo/github/YGGverse/aquatic-crawler)
 [![crates.io](https://img.shields.io/crates/v/aquatic-crawler.svg)](https://crates.io/crates/aquatic-crawler)
 
-Crawler/aggregation tool for the [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker.
+Crawler/aggregation tool for the [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker API.
 
 > [!NOTE]
 > Project in development!
