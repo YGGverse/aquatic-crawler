@@ -3,7 +3,7 @@ pub fn error(e: &anyhow::Error) {
 }
 
 pub fn info(message: String) {
-    eprintln!("[{}] [info] {message}", now())
+    println!("[{}] [info] {message}", now())
 }
 
 fn now() -> u128 {
