@@ -82,7 +82,7 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 
         ## Example:
 
-        Filter by image ext ``` --preload-regex '\.(png|gif|jpeg|webp)$' ```
+        Filter by image ext ``` --preload-regex '(png|gif|jpeg|jpg|webp)$' ```
 
         * requires `storage` argument defined
 
@@ -91,6 +91,11 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 
 --socks-proxy-url <SOCKS_PROXY_URL>
         Use `socks5://[username:password@]host:port`
+
+--index-capacity <INDEX_CAPACITY>
+        Estimated info-hash index capacity
+
+        [default: 1000]
 
 -s <SLEEP>
         Crawl loop delay in seconds

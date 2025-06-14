@@ -66,6 +66,10 @@ pub struct Argument {
     #[arg(long)]
     pub socks_proxy_url: Option<String>,
 
+    /// Estimated info-hash index capacity
+    #[arg(long, default_value_t = 1000)]
+    pub index_capacity: usize,
+
     /// Crawl loop delay in seconds
     #[arg(short, default_value_t = 300)]
     pub sleep: u64,
