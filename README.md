@@ -47,7 +47,7 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 -d, --debug <DEBUG>
         Debug level
 
-        * `e` - error * `i` - info * `t` - trace (e.g. to run with `RUST_LOG=librqbit=trace`)
+        * `e` - error * `i` - info * `t` - trace (run with `RUST_LOG=librqbit=trace`)
 
         [default: ei]
 
@@ -60,7 +60,7 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
         * PR#233 feature
 
 --storage <STORAGE>
-        Directory path to store reload data (e.g. `.torrent` files)
+        Directory path to store preloaded data (e.g. `.torrent` files)
 
 --torrent-tracker <TORRENT_TRACKER>
         Define custom tracker(s) to preload the `.torrent` files info
@@ -71,13 +71,37 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 --enable-dht
         Enable DHT resolver
 
+--enable-upnp-port-forwarding
+        Enable UPnP
+
 --enable-upload
         Enable upload
+
+--preload-regex <PRELOAD_REGEX>
+        Preload files match regex pattern (list only without preload by default)
+
+        ## Example:
+
+        Filter by image ext ``` --preload-regex '\.(png|gif|jpeg|webp)$' ```
+
+        * requires `storage` argument defined
+
+--save-torrents
+        Save resolved torrent files to the `storage` location
+
+--socks-proxy-url <SOCKS_PROXY_URL>
+        Use `socks5://[username:password@]host:port`
 
 -s <SLEEP>
         Crawl loop delay in seconds
 
         [default: 300]
+
+--upload-limit <UPLOAD_LIMIT>
+        Limit upload speed (b/s)
+
+--download-limit <DOWNLOAD_LIMIT>
+        Limit download speed (b/s)
 
 -h, --help
         Print help (see a summary with '-h')

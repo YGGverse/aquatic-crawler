@@ -7,7 +7,7 @@ pub struct Argument {
     ///
     /// * `e` - error
     /// * `i` - info
-    /// * `t` - trace (e.g. to run with `RUST_LOG=librqbit=trace`)
+    /// * `t` - trace (run with `RUST_LOG=librqbit=trace`)
     #[arg(short, long, default_value_t = String::from("ei"))]
     pub debug: String,
 
@@ -21,9 +21,9 @@ pub struct Argument {
     #[arg(long)]
     pub infohash_file: Vec<String>,
 
-    /// Directory path to store reload data (e.g. `.torrent` files)
+    /// Directory path to store preloaded data (e.g. `.torrent` files)
     #[arg(long)]
-    pub storage: Option<String>,
+    pub storage: String,
 
     /// Define custom tracker(s) to preload the `.torrent` files info
     #[arg(long)]
@@ -45,6 +45,23 @@ pub struct Argument {
     #[arg(long, default_value_t = false)]
     pub enable_upload: bool,
 
+    /// Preload files match regex pattern (list only without preload by default)
+    ///
+    /// ## Example:
+    ///
+    /// Filter by image ext
+    /// ```
+    /// --preload-regex '\.(png|gif|jpeg|webp)$'
+    /// ```
+    ///
+    /// * requires `storage` argument defined
+    #[arg(long)]
+    pub preload_regex: Option<String>,
+
+    /// Save resolved torrent files to the `storage` location
+    #[arg(long, default_value_t = true)]
+    pub save_torrents: bool,
+
     /// Use `socks5://[username:password@]host:port`
     #[arg(long)]
     pub socks_proxy_url: Option<String>,
@@ -52,4 +69,12 @@ pub struct Argument {
     /// Crawl loop delay in seconds
     #[arg(short, default_value_t = 300)]
     pub sleep: u64,
+
+    /// Limit upload speed (b/s)
+    #[arg(long)]
+    pub upload_limit: Option<u32>,
+
+    /// Limit download speed (b/s)
+    #[arg(long)]
+    pub download_limit: Option<u32>,
 }
