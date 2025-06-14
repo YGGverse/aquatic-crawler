@@ -51,7 +51,7 @@ pub struct Argument {
     ///
     /// Filter by image ext
     /// ```
-    /// --preload-regex '/\.(png|gif|jpeg|jpg|webp)$/i'
+    /// --preload-regex '(png|gif|jpeg|jpg|webp)$'
     /// ```
     ///
     /// * requires `storage` argument defined
