@@ -78,14 +78,16 @@ async fn main() -> Result<()> {
                             session.add_torrent(
                                 AddTorrent::from_url(format!("magnet:?xt=urn:btih:{i}")),
                                 Some(AddTorrentOptions {
+                                    paused: true, // continue after `only_files` init
                                     overwrite: true,
                                     disable_trackers: trackers.is_empty(),
                                     initial_peers: peers.initial_peers(),
                                     list_only: preload_regex.is_none(),
+                                    // it is important to blacklist all files preload until initiation
+                                    only_files: Some(Vec::new()),
                                     // the destination folder to preload files match `only_files_regex`
                                     // * e.g. images for audio albums
                                     output_folder: storage.output_folder(&i, true).ok(),
-                                    only_files_regex: preload_regex.as_ref().map(|r| r.to_string()),
                                     ..Default::default()
                                 }),
                             ),
@@ -95,18 +97,57 @@ async fn main() -> Result<()> {
                             Ok(r) => match r {
                                 // on `preload_regex` case only
                                 Ok(AddTorrentResponse::Added(id, mt)) => {
-                                    if arg.save_torrents {
-                                        mt.with_metadata(|m| {
+                                    let mut only_files_size = 0;
+                                    let mut only_files_save = HashSet::with_capacity(
+                                        arg.preload_max_filecount.unwrap_or_default(),
+                                    );
+                                    let mut only_files = HashSet::with_capacity(
+                                        arg.preload_max_filecount.unwrap_or_default(),
+                                    );
+                                    mt.wait_until_initialized().await?;
+                                    mt.with_metadata(|m| {
+                                        // init preload files list
+                                        if let Some(ref regex) = preload_regex {
+                                            for (id, info) in m.file_infos.iter().enumerate() {
+                                                if regex.is_match(
+                                                    info.relative_filename.to_str().unwrap(),
+                                                ) {
+                                                    if arg.preload_max_filesize.is_some_and(
+                                                        |limit| only_files_size + info.len > limit,
+                                                    ) {
+                                                        debug.info(&format!(
+                                                            "Total files size limit `{i}` reached!"
+                                                        ));
+                                                        break;
+                                                    }
+                                                    if arg.preload_max_filecount.is_some_and(
+                                                        |limit| only_files.len() + 1 > limit,
+                                                    ) {
+                                                        debug.info(&format!(
+                                                            "Total files count limit for `{i}` reached!"
+                                                        ));
+                                                        break;
+                                                    }
+                                                    only_files_size += info.len;
+                                                    only_files_save.insert(storage.absolute(&i, &info.relative_filename));
+                                                    only_files.insert(id);
+                                                }
+                                            }
+                                        }
+                                        // dump info-hash to the torrent file
+                                        if arg.save_torrents {
                                             save_torrent_file(
                                                 &storage,
                                                 &debug,
                                                 &i,
                                                 &m.torrent_bytes,
                                             )
-                                            // @TODO
-                                            // use `r.info` for Memory, SQLite, Manticore and other alternative storage type
-                                        })?;
-                                    }
+                                        }
+                                        // @TODO
+                                        // use `r.info` for Memory, SQLite, Manticore and other alternative storage type
+                                    })?;
+                                    session.update_only_files(&mt, &only_files).await?;
+                                    session.unpause(&mt).await?;
                                     // await for `preload_regex` files download to continue
                                     match time::timeout(
                                         Duration::from_secs(arg.download_torrent_timeout),
@@ -126,9 +167,7 @@ async fn main() -> Result<()> {
                                                     )
                                                     .await?;
                                                 // cleanup irrelevant files (see rqbit#408)
-                                                if let Some(r) = preload_regex.as_ref() {
-                                                    storage.cleanup(&i, Some(r))?;
-                                                }
+                                                storage.cleanup(&i, Some(only_files_save))?;
                                                 // ignore on the next crawl iterations for this session
                                                 index.insert(i);
                                             }

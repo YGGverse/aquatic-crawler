@@ -86,13 +86,19 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
         Enable upload
 
 --preload-regex <PRELOAD_REGEX>
-        Preload files match regex pattern (list only without preload by default)
+        Preload only files match regex pattern (list only without preload by default) * see also `preload_max_filesize`, `preload_max_filecount` options
 
         ## Example:
 
         Filter by image ext ``` --preload-regex '(png|gif|jpeg|jpg|webp)$' ```
 
         * requires `storage` argument defined
+
+--preload-max-filesize <PRELOAD_MAX_FILESIZE>
+        Max size sum of preloaded files per torrent (match `preload_regex`)
+
+--preload-max-filecount <PRELOAD_MAX_FILECOUNT>
+        Max count of preloaded files per torrent (match `preload_regex`)
 
 --save-torrents
         Save resolved torrent files to the `storage` location

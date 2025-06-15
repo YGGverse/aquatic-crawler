@@ -1,5 +1,5 @@
 use anyhow::{Result, bail};
-use std::{fs, io::Write, path::PathBuf, str::FromStr};
+use std::{collections::HashSet, fs, io::Write, path::PathBuf, str::FromStr};
 
 pub struct Storage(PathBuf);
 
@@ -53,12 +53,20 @@ impl Storage {
         Ok(p.to_string_lossy().to_string())
     }
 
+    pub fn absolute(&self, infohash: &str, file: &PathBuf) -> PathBuf {
+        let mut p = PathBuf::new();
+        p.push(&self.0);
+        p.push(infohash);
+        p.push(file);
+        p
+    }
+
     /// Recursively remove all files under the `infohash` location (see rqbit#408)
-    pub fn cleanup(&self, infohash: &str, skip_filename: Option<&regex::Regex>) -> Result<()> {
+    pub fn cleanup(&self, infohash: &str, keep_filenames: Option<HashSet<PathBuf>>) -> Result<()> {
         for e in walkdir::WalkDir::new(self.output_folder(infohash, false)?) {
             let e = e?;
-            let p = e.path();
-            if p.is_file() && skip_filename.is_none_or(|r| !r.is_match(p.to_str().unwrap())) {
+            let p = e.into_path();
+            if p.is_file() && keep_filenames.as_ref().is_none_or(|k| !k.contains(&p)) {
                 fs::remove_file(p)?;
             }
         }

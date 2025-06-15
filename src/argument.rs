@@ -49,7 +49,8 @@ pub struct Argument {
     #[arg(long, default_value_t = false)]
     pub enable_upload: bool,
 
-    /// Preload files match regex pattern (list only without preload by default)
+    /// Preload only files match regex pattern (list only without preload by default)
+    /// * see also `preload_max_filesize`, `preload_max_filecount` options
     ///
     /// ## Example:
     ///
@@ -61,6 +62,14 @@ pub struct Argument {
     /// * requires `storage` argument defined
     #[arg(long)]
     pub preload_regex: Option<String>,
+
+    /// Max size sum of preloaded files per torrent (match `preload_regex`)
+    #[arg(long)]
+    pub preload_max_filesize: Option<u64>,
+
+    /// Max count of preloaded files per torrent (match `preload_regex`)
+    #[arg(long)]
+    pub preload_max_filecount: Option<usize>,
 
     /// Save resolved torrent files to the `storage` location
     #[arg(long, default_value_t = true)]
