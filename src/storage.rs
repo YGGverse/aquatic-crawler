@@ -53,8 +53,7 @@ impl Storage {
         Ok(p.to_string_lossy().to_string())
     }
 
-    /// Recursively remove all files under the `infohash` location
-    /// that do not match the `skip_filename` (see rqbit#408)
+    /// Recursively remove all files under the `infohash` location (see rqbit#408)
     pub fn cleanup(&self, infohash: &str, skip_filename: Option<&regex::Regex>) -> Result<()> {
         for e in walkdir::WalkDir::new(self.output_folder(infohash, false)?) {
             let e = e?;
