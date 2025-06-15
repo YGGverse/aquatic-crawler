@@ -84,7 +84,9 @@ async fn main() -> Result<()> {
                                     initial_peers: peers.initial_peers(),
                                     list_only: preload_regex.is_none(),
                                     // it is important to blacklist all files preload until initiation
-                                    only_files: Some(Vec::new()),
+                                    only_files: Some(Vec::with_capacity(
+                                        arg.preload_max_filecount.unwrap_or_default(),
+                                    )),
                                     // the destination folder to preload files match `only_files_regex`
                                     // * e.g. images for audio albums
                                     output_folder: storage.output_folder(&i, true).ok(),
