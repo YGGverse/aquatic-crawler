@@ -4,7 +4,7 @@
 [![Dependencies](https://deps.rs/repo/github/YGGverse/aquatic-crawler/status.svg)](https://deps.rs/repo/github/YGGverse/aquatic-crawler)
 [![crates.io](https://img.shields.io/crates/v/aquatic-crawler.svg)](https://crates.io/crates/aquatic-crawler)
 
-Crawler/aggregation tool for the [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker API.
+Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker based on [librqbit](https://github.com/ikatson/rqbit/tree/main/crates/librqbit) API.
 
 > [!NOTE]
 > Project in development!
@@ -16,7 +16,7 @@ Crawler/aggregation tool for the [Aquatic](https://github.com/greatest-ape/aquat
         * [x] local file path
         * [ ] remote URL
 * Storage
-    * [x] File system (dump as `.torrent`)
+    * [x] File system (dump as `.torrent` + regex files)
         * [x] V1
         * [ ] V2
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search
