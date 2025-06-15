@@ -11,11 +11,11 @@ impl Peers {
         Ok(Self(p))
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
-    pub fn clone(&self) -> Vec<SocketAddr> {
-        self.0.clone()
+    pub fn initial_peers(&self) -> Option<Vec<SocketAddr>> {
+        if self.0.is_empty() {
+            None
+        } else {
+            Some(self.0.clone())
+        }
     }
 }

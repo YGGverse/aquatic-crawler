@@ -68,11 +68,7 @@ async fn main() -> Result<()> {
                                 Some(AddTorrentOptions {
                                     overwrite: true,
                                     disable_trackers: trackers.is_empty(),
-                                    initial_peers: if peers.is_empty() {
-                                        None
-                                    } else {
-                                        Some(peers.clone())
-                                    },
+                                    initial_peers: peers.initial_peers(),
                                     // preload nothing, but listing when regex pattern argument is given
                                     list_only: arg.preload_regex.is_none(),
                                     // this option allows rqbit manager to preload some or any files match pattern
