@@ -47,10 +47,10 @@ async fn main() -> Result<()> {
     let mut index = HashSet::with_capacity(arg.index_capacity);
     loop {
         debug.info("Index queue begin...");
-        // collect info-hashes from each API channel
         for source in &arg.infohash_file {
             debug.info(&format!("Index source `{source}`..."));
-            // aquatic server may update the stats at this moment, handle result manually
+            // grab latest info-hashes from this source
+            // * aquatic server may update the stats at this moment, handle result manually
             match api::infohashes(source) {
                 Ok(infohashes) => {
                     for i in infohashes {
