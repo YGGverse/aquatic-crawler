@@ -37,15 +37,35 @@ impl Storage {
         Ok(p)
     }
 
-    pub fn output_folder(&self, infohash: &str) -> Result<String> {
+    pub fn output_folder(&self, infohash: &str, create: bool) -> Result<String> {
         let mut p = PathBuf::new();
         p.push(&self.0);
         p.push(infohash);
         if p.is_file() {
             bail!("File destination is not directory!");
         }
-        fs::create_dir_all(&p)?;
+        if create {
+            fs::create_dir_all(&p)?;
+        }
+        if !p.is_dir() {
+            bail!("Destination directory not exists!")
+        }
         Ok(p.to_string_lossy().to_string())
+    }
+
+    /// Recursively remove all files match `pattern` under `infohash` location
+    pub fn purge_preload_regex(&self, infohash: &str, pattern: &str) -> Result<()> {
+        let r = regex::Regex::new(pattern)?;
+        for e in walkdir::WalkDir::new(self.output_folder(infohash, false)?)
+            .into_iter()
+            .filter_map(Result::ok)
+        {
+            let p = e.path();
+            if p.is_file() && !r.is_match(p.to_str().unwrap()) {
+                std::fs::remove_file(p)?;
+            }
+        }
+        Ok(())
     }
 
     pub fn path(&self) -> PathBuf {

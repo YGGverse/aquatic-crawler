@@ -83,7 +83,7 @@ async fn main() -> Result<()> {
                                     list_only: arg.preload_regex.is_none(),
                                     // the destination folder to preload files match `only_files_regex`
                                     // * e.g. images for audio albums
-                                    output_folder: storage.output_folder(&i).ok(),
+                                    output_folder: storage.output_folder(&i, true).ok(),
                                     only_files_regex: arg.preload_regex.clone(),
                                     ..Default::default()
                                 }),
@@ -124,6 +124,10 @@ async fn main() -> Result<()> {
                                                         false,
                                                     )
                                                     .await?;
+                                                // cleanup irrelevant files (see rqbit#408)
+                                                if let Some(ref r) = arg.preload_regex {
+                                                    storage.purge_preload_regex(&i, r)?;
+                                                }
                                                 // ignore on the next crawl iterations for this session
                                                 index.insert(mt.info_hash().as_string());
                                             }
