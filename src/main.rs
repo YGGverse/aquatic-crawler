@@ -69,12 +69,10 @@ async fn main() -> Result<()> {
                                     overwrite: true,
                                     disable_trackers: trackers.is_empty(),
                                     initial_peers: peers.initial_peers(),
-                                    // preload nothing, but listing when regex pattern argument is given
                                     list_only: arg.preload_regex.is_none(),
-                                    // this option allows rqbit manager to preload some or any files match pattern
-                                    // * useful to build index with multimedia files, like images for audio albums
+                                    // the destination folder to preload files match `only_files_regex`
+                                    // * e.g. images for audio albums
                                     output_folder: storage.output_folder(&i).ok(),
-                                    // applies preload some files to the destination directory (above)
                                     only_files_regex: arg.preload_regex.clone(),
                                     ..Default::default()
                                 }),
