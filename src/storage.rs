@@ -1,5 +1,5 @@
 use anyhow::{Result, bail};
-use std::{collections::HashSet, fs, io::Write, path::PathBuf, str::FromStr};
+use std::{fs, io::Write, path::PathBuf, str::FromStr};
 
 pub struct Storage(PathBuf);
 
@@ -62,7 +62,7 @@ impl Storage {
     }
 
     /// Recursively remove all files under the `infohash` location (see rqbit#408)
-    pub fn cleanup(&self, infohash: &str, keep_filenames: Option<HashSet<PathBuf>>) -> Result<()> {
+    pub fn cleanup(&self, infohash: &str, keep_filenames: Option<Vec<PathBuf>>) -> Result<()> {
         for e in walkdir::WalkDir::new(self.output_folder(infohash, false)?) {
             let e = e?;
             let p = e.into_path();

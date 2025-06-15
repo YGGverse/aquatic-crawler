@@ -98,7 +98,7 @@ async fn main() -> Result<()> {
                                 // on `preload_regex` case only
                                 Ok(AddTorrentResponse::Added(id, mt)) => {
                                     let mut only_files_size = 0;
-                                    let mut only_files_save = HashSet::with_capacity(
+                                    let mut only_files_keep = Vec::with_capacity(
                                         arg.preload_max_filecount.unwrap_or_default(),
                                     );
                                     let mut only_files = HashSet::with_capacity(
@@ -129,7 +129,7 @@ async fn main() -> Result<()> {
                                                         break;
                                                     }
                                                     only_files_size += info.len;
-                                                    only_files_save.insert(storage.absolute(&i, &info.relative_filename));
+                                                    only_files_keep.push(storage.absolute(&i, &info.relative_filename));
                                                     only_files.insert(id);
                                                 }
                                             }
@@ -167,7 +167,7 @@ async fn main() -> Result<()> {
                                                     )
                                                     .await?;
                                                 // cleanup irrelevant files (see rqbit#408)
-                                                storage.cleanup(&i, Some(only_files_save))?;
+                                                storage.cleanup(&i, Some(only_files_keep))?;
                                                 // ignore on the next crawl iterations for this session
                                                 index.insert(i);
                                             }
