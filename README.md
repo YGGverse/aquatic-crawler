@@ -4,7 +4,7 @@
 [![Dependencies](https://deps.rs/repo/github/YGGverse/aquatic-crawler/status.svg)](https://deps.rs/repo/github/YGGverse/aquatic-crawler)
 [![crates.io](https://img.shields.io/crates/v/aquatic-crawler.svg)](https://crates.io/crates/aquatic-crawler)
 
-Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker based on [librqbit](https://github.com/ikatson/rqbit/tree/main/crates/librqbit) API.
+Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker based on [librqbit](https://github.com/ikatson/rqbit/tree/main/crates/librqbit) API
 
 > [!NOTE]
 > Project in development!
@@ -38,8 +38,6 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
                 --torrent-tracker udp://host2:port\
                 --storage         /path/to/storage
 ```
-* all arguments are optional, to support multiple source and target drivers
-* running without arguments does nothing!
 
 ### Options
 
