@@ -43,23 +43,24 @@ async fn main() -> Result<()> {
     // begin
     debug.info("Crawler started");
 
-    // collect processed info hashes to skip on the next cycles
+    // collect processed info hashes to skip on the next iterations (for this session)
     let mut index = HashSet::with_capacity(arg.index_capacity);
     loop {
         debug.info("Index queue begin...");
         // collect info-hashes from each API channel
         for source in &arg.infohash_file {
             debug.info(&format!("Index source `{source}`..."));
-            // aquatic server may update the stats at this moment,
-            // handle this state manually
+            // aquatic server may update the stats at this moment, handle result manually
             match api::infohashes(source) {
                 Ok(infohashes) => {
                     for i in infohashes {
+                        // is already indexed?
                         if index.contains(&i) {
                             continue;
                         }
                         debug.info(&format!("Index `{i}`..."));
-                        // run the crawler in single thread, use timeout to skip dead connections
+                        // run the crawler in single thread for performance reasons,
+                        // use `timeout` argument option to skip the dead connections.
                         match time::timeout(
                             timeout,
                             session.add_torrent(
@@ -86,6 +87,7 @@ async fn main() -> Result<()> {
                         .await
                         {
                             Ok(r) => match r {
+                                // on `preload_regex` case only
                                 Ok(AddTorrentResponse::Added(id, mt)) => {
                                     if arg.save_torrents {
                                         mt.with_metadata(|m| {
@@ -99,17 +101,20 @@ async fn main() -> Result<()> {
                                             // use `r.info` for Memory, SQLite, Manticore and other alternative storage type
                                         })?;
                                     }
+                                    // await for `preload_regex` files download to continue
                                     match time::timeout(timeout, mt.wait_until_completed()).await {
                                         Ok(r) => {
                                             if let Err(e) = r {
                                                 debug.info(&format!("Skip `{i}`: `{e}`."))
                                             } else {
+                                                // remove torrent from session as indexed
                                                 session
                                                     .delete(
                                                         librqbit::api::TorrentIdOrHash::Id(id),
                                                         false,
                                                     )
                                                     .await?;
+                                                // ignore on the next crawl iterations for this session
                                                 index.insert(mt.info_hash().as_string());
                                             }
                                         }
@@ -123,6 +128,8 @@ async fn main() -> Result<()> {
                                     // @TODO
                                     // use `r.info` for Memory, SQLite,
                                     // Manticore and other alternative storage type
+
+                                    // ignore on the next crawl iterations for this session
                                     index.insert(r.info_hash.as_string());
                                 }
                                 // unexpected as should be deleted
