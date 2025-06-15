@@ -129,7 +129,7 @@ async fn main() -> Result<()> {
                                                     storage.cleanup(&i, r)?;
                                                 }
                                                 // ignore on the next crawl iterations for this session
-                                                index.insert(mt.info_hash().as_string());
+                                                index.insert(i);
                                             }
                                         }
                                         Err(e) => debug.info(&format!("Skip `{i}`: `{e}`.")),
