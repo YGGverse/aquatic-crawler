@@ -16,7 +16,7 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
         * [x] local file path
         * [ ] remote URL
 * Storage
-    * [x] File system (dump as `.torrent` + regex files)
+    * [x] File system (resolve infohash to the `.torrent` + download content files match the regex pattern)
         * [x] V1
         * [ ] V2
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search
