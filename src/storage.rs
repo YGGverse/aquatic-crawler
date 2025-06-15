@@ -53,16 +53,17 @@ impl Storage {
         Ok(p.to_string_lossy().to_string())
     }
 
-    /// Recursively remove all files match `pattern` under `infohash` location
-    pub fn purge_preload_regex(&self, infohash: &str, pattern: &str) -> Result<()> {
-        let r = regex::Regex::new(pattern)?;
+    /// Recursively remove all files under the `infohash` location
+    /// that do not match the `skip_filename_pattern` (see rqbit#408)
+    pub fn cleanup(&self, infohash: &str, skip_filename_pattern: &str) -> Result<()> {
+        let r = regex::Regex::new(skip_filename_pattern)?;
         for e in walkdir::WalkDir::new(self.output_folder(infohash, false)?)
             .into_iter()
             .filter_map(Result::ok)
         {
             let p = e.path();
             if p.is_file() && !r.is_match(p.to_str().unwrap()) {
-                std::fs::remove_file(p)?;
+                fs::remove_file(p)?;
             }
         }
         Ok(())

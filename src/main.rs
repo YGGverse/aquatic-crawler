@@ -126,7 +126,7 @@ async fn main() -> Result<()> {
                                                     .await?;
                                                 // cleanup irrelevant files (see rqbit#408)
                                                 if let Some(ref r) = arg.preload_regex {
-                                                    storage.purge_preload_regex(&i, r)?;
+                                                    storage.cleanup(&i, r)?;
                                                 }
                                                 // ignore on the next crawl iterations for this session
                                                 index.insert(mt.info_hash().as_string());
