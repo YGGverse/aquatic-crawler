@@ -144,7 +144,7 @@ async fn main() -> Result<()> {
                                     // Manticore and other alternative storage type
 
                                     // ignore on the next crawl iterations for this session
-                                    index.insert(r.info_hash.as_string());
+                                    index.insert(i);
                                 }
                                 // unexpected as should be deleted
                                 Ok(AddTorrentResponse::AlreadyManaged(..)) => panic!(),
