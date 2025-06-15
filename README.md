@@ -97,6 +97,11 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 
         [default: 1000]
 
+-t <TIMEOUT>
+        Max time to handle one torrent
+
+        [default: 10]
+
 -s <SLEEP>
         Crawl loop delay in seconds
 

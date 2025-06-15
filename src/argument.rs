@@ -70,6 +70,10 @@ pub struct Argument {
     #[arg(long, default_value_t = 1000)]
     pub index_capacity: usize,
 
+    /// Max time to handle one torrent
+    #[arg(short, default_value_t = 10)]
+    pub timeout: u64,
+
     /// Crawl loop delay in seconds
     #[arg(short, default_value_t = 300)]
     pub sleep: u64,
