@@ -14,11 +14,11 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
 > [!TIP]
 > For details on all implemented features, see the [Options](#options) section
 
-* Info-hash versions supported
+* Info-hash versions
     * [x] 1
     * [ ] 2
-* Targets supported
-    * [x] IPv4/IPv6 info-hash JSON/API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233))
+* Import sources
+    * [x] IPv4 / IPv6 info-hash JSON/API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233))
         * [x] local file path (`--infohash-file`)
         * [ ] remote URL
 * Storage
