@@ -11,14 +11,15 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
 
 ## Roadmap
 
+* Info-hash versions supported
+    * [x] 1
+    * [ ] 2
 * Targets supported
     * [x] IPv4/IPv6 info-hash JSON/API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233))
         * [x] local file path
         * [ ] remote URL
 * Storage
     * [x] File system (resolve infohash to the `.torrent` + download content files match the regex pattern)
-        * [x] V1
-        * [ ] V2
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search
     * [ ] SQLite
 
@@ -36,7 +37,8 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
                 --infohash-file   /path/to/another-source.json\
                 --torrent-tracker udp://host1:port\
                 --torrent-tracker udp://host2:port\
-                --storage         /path/to/storage
+                --storage         /path/to/storage\
+                --enable-tcp
 ```
 
 ### Options
@@ -49,7 +51,7 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 
         [default: ei]
 
--c, --clear
+--clear
         Clear previous index collected on crawl session start
 
 --infohash-file <INFOHASH_FILE>
@@ -69,6 +71,9 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 --enable-dht
         Enable DHT resolver
 
+--enable-tcp
+        Enable TCP connection
+
 --enable-upnp-port-forwarding
         Enable UPnP
 
@@ -87,20 +92,34 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 --save-torrents
         Save resolved torrent files to the `storage` location
 
---socks-proxy-url <SOCKS_PROXY_URL>
+--proxy-url <PROXY_URL>
         Use `socks5://[username:password@]host:port`
+
+--peer-connect-timeout <PEER_CONNECT_TIMEOUT>
+
+
+--peer-read-write-timeout <PEER_READ_WRITE_TIMEOUT>
+
+
+--peer-keep-alive-interval <PEER_KEEP_ALIVE_INTERVAL>
+
 
 --index-capacity <INDEX_CAPACITY>
         Estimated info-hash index capacity
 
         [default: 1000]
 
--t <TIMEOUT>
-        Max time to handle one torrent
+--add-torrent-timeout <ADD_TORRENT_TIMEOUT>
+        Max time to handle each torrent
 
         [default: 10]
 
--s <SLEEP>
+--download-torrent-timeout <DOWNLOAD_TORRENT_TIMEOUT>
+        Max time to download each torrent
+
+        [default: 10]
+
+--sleep <SLEEP>
         Crawl loop delay in seconds
 
         [default: 300]

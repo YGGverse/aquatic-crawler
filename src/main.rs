@@ -12,7 +12,10 @@ use storage::Storage;
 #[tokio::main]
 async fn main() -> Result<()> {
     use clap::Parser;
-    use librqbit::{AddTorrent, AddTorrentOptions, AddTorrentResponse, SessionOptions};
+    use librqbit::{
+        AddTorrent, AddTorrentOptions, AddTorrentResponse, ConnectionOptions,
+        PeerConnectionOptions, SessionOptions,
+    };
     use std::{collections::HashSet, num::NonZero, time::Duration};
     use tokio::time;
 
@@ -21,11 +24,19 @@ async fn main() -> Result<()> {
     let debug = Debug::init(&arg.debug)?;
     let peers = peers::Peers::init(&arg.initial_peer)?;
     let storage = Storage::init(&arg.storage, arg.clear)?;
-    let timeout = Duration::from_secs(arg.timeout);
     let trackers = trackers::Trackers::init(&arg.torrent_tracker)?;
     let session = librqbit::Session::new_with_opts(
         storage.path(),
         SessionOptions {
+            connect: Some(ConnectionOptions {
+                enable_tcp: arg.enable_tcp,
+                proxy_url: arg.proxy_url,
+                peer_opts: Some(PeerConnectionOptions {
+                    connect_timeout: arg.peer_connect_timeout.map(Duration::from_secs),
+                    read_write_timeout: arg.peer_read_write_timeout.map(Duration::from_secs),
+                    keep_alive_interval: arg.peer_keep_alive_interval.map(Duration::from_secs),
+                }),
+            }),
             disable_upload: !arg.enable_upload,
             disable_dht: !arg.enable_dht,
             disable_dht_persistence: true,
@@ -62,7 +73,7 @@ async fn main() -> Result<()> {
                         // run the crawler in single thread for performance reasons,
                         // use `timeout` argument option to skip the dead connections.
                         match time::timeout(
-                            timeout,
+                            Duration::from_secs(arg.add_torrent_timeout),
                             session.add_torrent(
                                 AddTorrent::from_url(format!("magnet:?xt=urn:btih:{i}")),
                                 Some(AddTorrentOptions {
@@ -96,7 +107,12 @@ async fn main() -> Result<()> {
                                         })?;
                                     }
                                     // await for `preload_regex` files download to continue
-                                    match time::timeout(timeout, mt.wait_until_completed()).await {
+                                    match time::timeout(
+                                        Duration::from_secs(arg.download_torrent_timeout),
+                                        mt.wait_until_completed(),
+                                    )
+                                    .await
+                                    {
                                         Ok(r) => {
                                             if let Err(e) = r {
                                                 debug.info(&format!("Skip `{i}`: `{e}`."))

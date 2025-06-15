@@ -12,7 +12,7 @@ pub struct Argument {
     pub debug: String,
 
     /// Clear previous index collected on crawl session start
-    #[arg(short, long, default_value_t = false)]
+    #[arg(long, default_value_t = false)]
     pub clear: bool,
 
     /// Absolute filename(s) to the Aquatic tracker info-hash JSON/API
@@ -36,6 +36,10 @@ pub struct Argument {
     /// Enable DHT resolver
     #[arg(long, default_value_t = false)]
     pub enable_dht: bool,
+
+    /// Enable TCP connection
+    #[arg(long, default_value_t = false)]
+    pub enable_tcp: bool,
 
     /// Enable UPnP
     #[arg(long, default_value_t = false)]
@@ -64,18 +68,32 @@ pub struct Argument {
 
     /// Use `socks5://[username:password@]host:port`
     #[arg(long)]
-    pub socks_proxy_url: Option<String>,
+    pub proxy_url: Option<String>,
+
+    // Peer options
+    #[arg(long)]
+    pub peer_connect_timeout: Option<u64>,
+
+    #[arg(long)]
+    pub peer_read_write_timeout: Option<u64>,
+
+    #[arg(long)]
+    pub peer_keep_alive_interval: Option<u64>,
 
     /// Estimated info-hash index capacity
     #[arg(long, default_value_t = 1000)]
     pub index_capacity: usize,
 
-    /// Max time to handle one torrent
-    #[arg(short, default_value_t = 10)]
-    pub timeout: u64,
+    /// Max time to handle each torrent
+    #[arg(long, default_value_t = 10)]
+    pub add_torrent_timeout: u64,
+
+    /// Max time to download each torrent
+    #[arg(long, default_value_t = 10)]
+    pub download_torrent_timeout: u64,
 
     /// Crawl loop delay in seconds
-    #[arg(short, default_value_t = 300)]
+    #[arg(long, default_value_t = 300)]
     pub sleep: u64,
 
     /// Limit upload speed (b/s)
