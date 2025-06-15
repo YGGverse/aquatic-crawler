@@ -54,15 +54,14 @@ impl Storage {
     }
 
     /// Recursively remove all files under the `infohash` location
-    /// that do not match the `skip_filename_pattern` (see rqbit#408)
-    pub fn cleanup(&self, infohash: &str, skip_filename_pattern: &str) -> Result<()> {
-        let r = regex::Regex::new(skip_filename_pattern)?;
+    /// that do not match the `skip_filename` (see rqbit#408)
+    pub fn cleanup(&self, infohash: &str, skip_filename: Option<&regex::Regex>) -> Result<()> {
         for e in walkdir::WalkDir::new(self.output_folder(infohash, false)?)
             .into_iter()
             .filter_map(Result::ok)
         {
             let p = e.path();
-            if p.is_file() && !r.is_match(p.to_str().unwrap()) {
+            if p.is_file() && skip_filename.is_none_or(|r| !r.is_match(p.to_str().unwrap())) {
                 fs::remove_file(p)?;
             }
         }

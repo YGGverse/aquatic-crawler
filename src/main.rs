@@ -25,6 +25,7 @@ async fn main() -> Result<()> {
     let peers = peers::Peers::init(&arg.initial_peer)?;
     let storage = Storage::init(&arg.storage, arg.clear)?;
     let trackers = trackers::Trackers::init(&arg.torrent_tracker)?;
+    let preload_regex = arg.preload_regex.map(|ref r| regex::Regex::new(r).unwrap());
     let session = librqbit::Session::new_with_opts(
         storage.path(),
         SessionOptions {
@@ -80,11 +81,11 @@ async fn main() -> Result<()> {
                                     overwrite: true,
                                     disable_trackers: trackers.is_empty(),
                                     initial_peers: peers.initial_peers(),
-                                    list_only: arg.preload_regex.is_none(),
+                                    list_only: preload_regex.is_none(),
                                     // the destination folder to preload files match `only_files_regex`
                                     // * e.g. images for audio albums
                                     output_folder: storage.output_folder(&i, true).ok(),
-                                    only_files_regex: arg.preload_regex.clone(),
+                                    only_files_regex: preload_regex.as_ref().map(|r| r.to_string()),
                                     ..Default::default()
                                 }),
                             ),
@@ -125,8 +126,8 @@ async fn main() -> Result<()> {
                                                     )
                                                     .await?;
                                                 // cleanup irrelevant files (see rqbit#408)
-                                                if let Some(ref r) = arg.preload_regex {
-                                                    storage.cleanup(&i, r)?;
+                                                if let Some(r) = preload_regex.as_ref() {
+                                                    storage.cleanup(&i, Some(r))?;
                                                 }
                                                 // ignore on the next crawl iterations for this session
                                                 index.insert(i);
