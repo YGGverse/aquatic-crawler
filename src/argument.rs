@@ -63,6 +63,10 @@ pub struct Argument {
     #[arg(long)]
     pub preload_regex: Option<String>,
 
+    /// Stop crawler on total preload files size reached
+    #[arg(long)]
+    pub preload_total_size: Option<u64>,
+
     /// Max size sum of preloaded files per torrent (match `preload_regex`)
     #[arg(long)]
     pub preload_max_filesize: Option<u64>,

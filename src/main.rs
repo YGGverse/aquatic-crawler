@@ -16,7 +16,11 @@ async fn main() -> Result<()> {
         AddTorrent, AddTorrentOptions, AddTorrentResponse, ConnectionOptions,
         PeerConnectionOptions, SessionOptions,
     };
-    use std::{collections::HashSet, num::NonZero, time::Duration};
+    use std::{
+        collections::{HashMap, HashSet},
+        num::NonZero,
+        time::Duration,
+    };
     use tokio::time;
 
     // init components
@@ -56,7 +60,7 @@ async fn main() -> Result<()> {
     debug.info("Crawler started");
 
     // collect processed info hashes to skip on the next iterations (for this session)
-    let mut index = HashSet::with_capacity(arg.index_capacity);
+    let mut index = HashMap::with_capacity(arg.index_capacity);
     loop {
         debug.info("Index queue begin...");
         for source in &arg.infohash_file {
@@ -67,7 +71,7 @@ async fn main() -> Result<()> {
                 Ok(infohashes) => {
                     for i in infohashes {
                         // is already indexed?
-                        if index.contains(&i) {
+                        if index.contains_key(&i) {
                             continue;
                         }
                         debug.info(&format!("Index `{i}`..."));
@@ -159,7 +163,7 @@ async fn main() -> Result<()> {
                                     // cleanup irrelevant files (see rqbit#408)
                                     storage.cleanup(&i, Some(only_files_keep))?;
                                     // ignore on the next crawl iterations for this session
-                                    index.insert(i);
+                                    index.insert(i, only_files_size);
                                 }
                                 Ok(AddTorrentResponse::ListOnly(r)) => {
                                     if arg.save_torrents {
@@ -170,7 +174,7 @@ async fn main() -> Result<()> {
                                     // Manticore and other alternative storage type
 
                                     // ignore on the next crawl iterations for this session
-                                    index.insert(i);
+                                    index.insert(i, 0);
                                 }
                                 // unexpected as should be deleted
                                 Ok(AddTorrentResponse::AlreadyManaged(..)) => panic!(),
@@ -182,6 +186,12 @@ async fn main() -> Result<()> {
                 }
                 Err(e) => debug.error(&format!("API issue for `{source}`: `{e}`")),
             }
+        }
+        if arg
+            .preload_total_size
+            .is_some_and(|s| index.values().sum::<u64>() > s)
+        {
+            panic!("Preload content size {} bytes reached!", 0)
         }
         debug.info(&format!(
             "Index completed, {} total, await {} seconds to continue...",

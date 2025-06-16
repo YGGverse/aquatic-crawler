@@ -94,6 +94,9 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 
         * requires `storage` argument defined
 
+--preload-total-size <PRELOAD_TOTAL_SIZE>
+        Stop crawler on total preload files size reached
+
 --preload-max-filesize <PRELOAD_MAX_FILESIZE>
         Max size sum of preloaded files per torrent (match `preload_regex`)
 
@@ -122,11 +125,6 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 
 --add-torrent-timeout <ADD_TORRENT_TIMEOUT>
         Max time to handle each torrent
-
-        [default: 10]
-
---download-torrent-timeout <DOWNLOAD_TORRENT_TIMEOUT>
-        Max time to download each torrent
 
         [default: 10]
 
