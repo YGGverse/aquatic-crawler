@@ -151,31 +151,15 @@ async fn main() -> Result<()> {
                                     session.update_only_files(&mt, &only_files).await?;
                                     session.unpause(&mt).await?;
                                     // await for `preload_regex` files download to continue
-                                    match time::timeout(
-                                        Duration::from_secs(arg.download_torrent_timeout),
-                                        mt.wait_until_completed(),
-                                    )
-                                    .await
-                                    {
-                                        Ok(r) => {
-                                            if let Err(e) = r {
-                                                debug.info(&format!("Skip `{i}`: `{e}`."))
-                                            } else {
-                                                // remove torrent from session as indexed
-                                                session
-                                                    .delete(
-                                                        librqbit::api::TorrentIdOrHash::Id(id),
-                                                        false,
-                                                    )
-                                                    .await?;
-                                                // cleanup irrelevant files (see rqbit#408)
-                                                storage.cleanup(&i, Some(only_files_keep))?;
-                                                // ignore on the next crawl iterations for this session
-                                                index.insert(i);
-                                            }
-                                        }
-                                        Err(e) => debug.info(&format!("Skip `{i}`: `{e}`.")),
-                                    }
+                                    mt.wait_until_completed().await?;
+                                    // remove torrent from session as indexed
+                                    session
+                                        .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
+                                        .await?;
+                                    // cleanup irrelevant files (see rqbit#408)
+                                    storage.cleanup(&i, Some(only_files_keep))?;
+                                    // ignore on the next crawl iterations for this session
+                                    index.insert(i);
                                 }
                                 Ok(AddTorrentResponse::ListOnly(r)) => {
                                     if arg.save_torrents {

@@ -97,10 +97,6 @@ pub struct Argument {
     #[arg(long, default_value_t = 10)]
     pub add_torrent_timeout: u64,
 
-    /// Max time to download each torrent
-    #[arg(long, default_value_t = 10)]
-    pub download_torrent_timeout: u64,
-
     /// Crawl loop delay in seconds
     #[arg(long, default_value_t = 300)]
     pub sleep: u64,
