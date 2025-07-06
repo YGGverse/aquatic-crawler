@@ -21,7 +21,7 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
     * [x] IPv4 / IPv6 info-hash JSON/API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233))
         * [x] local file path (`--infohash-file`)
         * [ ] remote URL
-* Storage
+* Export options
     * [x] File system (`--storage`)
         * [x] resolve infohash to the `.torrent` file (`--save-torrents`)
         * [x] download content files match the regex pattern (`--preload-regex`)
