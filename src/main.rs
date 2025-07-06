@@ -1,13 +1,24 @@
 mod api;
 mod argument;
 mod debug;
+mod index;
 mod peers;
+mod rss;
 mod storage;
 mod trackers;
 
 use anyhow::Result;
+use chrono::Utc;
 use debug::Debug;
+use index::Index;
+use rss::Rss;
+use std::{
+    collections::{HashMap, HashSet},
+    num::NonZero,
+    time::Duration,
+};
 use storage::Storage;
+use url::Url;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -15,11 +26,6 @@ async fn main() -> Result<()> {
     use librqbit::{
         AddTorrent, AddTorrentOptions, AddTorrentResponse, ConnectionOptions,
         PeerConnectionOptions, SessionOptions,
-    };
-    use std::{
-        collections::{HashMap, HashSet},
-        num::NonZero,
-        time::Duration,
     };
     use tokio::time;
 
@@ -58,8 +64,8 @@ async fn main() -> Result<()> {
 
     // begin
     debug.info("Crawler started");
-
     // collect processed info hashes to skip on the next iterations (for this session)
+    // * also contains optional meta info to export index as RSS or any other format
     let mut index = HashMap::with_capacity(arg.index_capacity);
     loop {
         debug.info("Index queue begin...");
@@ -80,7 +86,7 @@ async fn main() -> Result<()> {
                         match time::timeout(
                             Duration::from_secs(arg.add_torrent_timeout),
                             session.add_torrent(
-                                AddTorrent::from_url(format!("magnet:?xt=urn:btih:{i}")),
+                                AddTorrent::from_url(magnet(&i, None)),
                                 Some(AddTorrentOptions {
                                     paused: true, // continue after `only_files` init
                                     overwrite: true,
@@ -111,7 +117,7 @@ async fn main() -> Result<()> {
                                         arg.preload_max_filecount.unwrap_or_default(),
                                     );
                                     mt.wait_until_initialized().await?;
-                                    mt.with_metadata(|m| {
+                                    let name = mt.with_metadata(|m| {
                                         // init preload files list
                                         if let Some(ref regex) = preload_regex {
                                             for (id, info) in m.file_infos.iter().enumerate() {
@@ -151,6 +157,7 @@ async fn main() -> Result<()> {
                                         }
                                         // @TODO
                                         // use `r.info` for Memory, SQLite, Manticore and other alternative storage type
+                                        m.info.name.as_ref().map(|n|n.to_string())
                                     })?;
                                     session.update_only_files(&mt, &only_files).await?;
                                     session.unpause(&mt).await?;
@@ -162,19 +169,33 @@ async fn main() -> Result<()> {
                                         .await?;
                                     // cleanup irrelevant files (see rqbit#408)
                                     storage.cleanup(&i, Some(only_files_keep))?;
-                                    // ignore on the next crawl iterations for this session
-                                    index.insert(i, only_files_size);
+
+                                    index.insert(
+                                        i,
+                                        Index {
+                                            time: Utc::now(),
+                                            node: only_files_size,
+                                            name,
+                                        },
+                                    );
                                 }
                                 Ok(AddTorrentResponse::ListOnly(r)) => {
                                     if arg.save_torrents {
                                         save_torrent_file(&storage, &debug, &i, &r.torrent_bytes)
                                     }
+
                                     // @TODO
                                     // use `r.info` for Memory, SQLite,
                                     // Manticore and other alternative storage type
 
-                                    // ignore on the next crawl iterations for this session
-                                    index.insert(i, 0);
+                                    index.insert(
+                                        i,
+                                        Index {
+                                            time: Utc::now(),
+                                            node: 0,
+                                            name: r.info.name.map(|n| n.to_string()),
+                                        },
+                                    );
                                 }
                                 // unexpected as should be deleted
                                 Ok(AddTorrentResponse::AlreadyManaged(..)) => panic!(),
@@ -187,9 +208,27 @@ async fn main() -> Result<()> {
                 Err(e) => debug.error(&format!("API issue for `{source}`: `{e}`")),
             }
         }
+        if let Some(ref export_rss) = arg.export_rss {
+            let mut rss = Rss::new(
+                export_rss,
+                &arg.export_rss_title,
+                &arg.export_rss_link,
+                &arg.export_rss_description,
+                Some(trackers.clone()),
+            )?;
+            for (k, v) in &index {
+                rss.push(
+                    k,
+                    v.name.as_ref().unwrap_or(k),
+                    None, // @TODO
+                    Some(&v.time.to_rfc2822()),
+                )?
+            }
+            rss.commit()?
+        }
         if arg
             .preload_total_size
-            .is_some_and(|s| index.values().sum::<u64>() > s)
+            .is_some_and(|s| index.values().map(|i| i.node).sum::<u64>() > s)
         {
             panic!("Preload content size {} bytes reached!", 0)
         }
@@ -211,4 +250,20 @@ fn save_torrent_file(s: &Storage, d: &Debug, i: &str, b: &[u8]) {
             Err(e) => d.error(&e.to_string()),
         }
     }
+}
+
+/// Build magnet URI
+fn magnet(infohash: &str, trackers: Option<&HashSet<Url>>) -> String {
+    let mut m = if infohash.len() == 40 {
+        format!("magnet:?xt=urn:btih:{infohash}")
+    } else {
+        todo!("infohash v2 is not supported by librqbit")
+    };
+    if let Some(t) = trackers {
+        for tracker in t {
+            m.push_str("&tr=");
+            m.push_str(&urlencoding::encode(tracker.as_str()))
+        }
+    }
+    m
 }

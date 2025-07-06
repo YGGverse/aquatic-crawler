@@ -25,6 +25,7 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
     * [x] File system (`--storage`)
         * [x] resolve infohash to the `.torrent` file (`--save-torrents`)
         * [x] download content files match the regex pattern (`--preload-regex`)
+    * [x] RSS feed export
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search
     * [ ] SQLite
 
@@ -49,99 +50,116 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 ### Options
 
 ``` bash
--d, --debug <DEBUG>
-        Debug level
+  -d, --debug <DEBUG>
+          Debug level
 
-        * `e` - error * `i` - info * `t` - trace (run with `RUST_LOG=librqbit=trace`)
+          * `e` - error
+          * `i` - info
+          * `t` - trace (run with `RUST_LOG=librqbit=trace`)
 
-        [default: ei]
+          [default: ei]
 
---clear
-        Clear previous index collected on crawl session start
+      --clear
+          Clear previous index collected on crawl session start
 
---infohash-file <INFOHASH_FILE>
-        Absolute filename(s) to the Aquatic tracker info-hash JSON/API
+      --infohash-file <INFOHASH_FILE>
+          Absolute filename(s) to the Aquatic tracker info-hash JSON/API
 
-        * PR#233 feature
+          * PR#233 feature
 
---storage <STORAGE>
-        Directory path to store preloaded data (e.g. `.torrent` files)
+      --storage <STORAGE>
+          Directory path to store preloaded data (e.g. `.torrent` files)
 
---torrent-tracker <TORRENT_TRACKER>
-        Define custom tracker(s) to preload the `.torrent` files info
+      --torrent-tracker <TORRENT_TRACKER>
+          Define custom tracker(s) to preload the `.torrent` files info
 
---initial-peer <INITIAL_PEER>
-        Define initial peer(s) to preload the `.torrent` files info
+      --initial-peer <INITIAL_PEER>
+          Define initial peer(s) to preload the `.torrent` files info
 
---enable-dht
-        Enable DHT resolver
+      --export-rss <EXPORT_RSS>
+          File path to export RSS feed
 
---enable-tcp
-        Enable TCP connection
+      --export-rss-title <EXPORT_RSS_TITLE>
+          Custom title for RSS feed (channel)
 
---enable-upnp-port-forwarding
-        Enable UPnP
+          [default: aquatic-crawler]
 
---enable-upload
-        Enable upload
+      --export-rss-link <EXPORT_RSS_LINK>
+          Custom link for RSS feed (channel)
 
---preload-regex <PRELOAD_REGEX>
-        Preload only files match regex pattern (list only without preload by default) * see also `preload_max_filesize`, `preload_max_filecount` options
+      --export-rss-description <EXPORT_RSS_DESCRIPTION>
+          Custom description for RSS feed (channel)
 
-        ## Example:
+      --enable-dht
+          Enable DHT resolver
 
-        Filter by image ext ``` --preload-regex '(png|gif|jpeg|jpg|webp)$' ```
+      --enable-tcp
+          Enable TCP connection
 
-        * requires `storage` argument defined
+      --enable-upnp-port-forwarding
+          Enable UPnP
 
---preload-total-size <PRELOAD_TOTAL_SIZE>
-        Stop crawler on total preload files size reached
+      --enable-upload
+          Enable upload
 
---preload-max-filesize <PRELOAD_MAX_FILESIZE>
-        Max size sum of preloaded files per torrent (match `preload_regex`)
+      --preload-regex <PRELOAD_REGEX>
+          Preload only files match regex pattern (list only without preload by default)
+          * see also `preload_max_filesize`, `preload_max_filecount` options
 
---preload-max-filecount <PRELOAD_MAX_FILECOUNT>
-        Max count of preloaded files per torrent (match `preload_regex`)
+          ## Example:
 
---save-torrents
-        Save resolved torrent files to the `storage` location
+          Filter by image ext ``` --preload-regex '(png|gif|jpeg|jpg|webp)$' ```
 
---proxy-url <PROXY_URL>
-        Use `socks5://[username:password@]host:port`
+          * requires `storage` argument defined
 
---peer-connect-timeout <PEER_CONNECT_TIMEOUT>
+      --preload-total-size <PRELOAD_TOTAL_SIZE>
+          Stop crawler on total preload files size reached
+
+      --preload-max-filesize <PRELOAD_MAX_FILESIZE>
+          Max size sum of preloaded files per torrent (match `preload_regex`)
+
+      --preload-max-filecount <PRELOAD_MAX_FILECOUNT>
+          Max count of preloaded files per torrent (match `preload_regex`)
+
+      --save-torrents
+          Save resolved torrent files to the `storage` location
+
+      --proxy-url <PROXY_URL>
+          Use `socks5://[username:password@]host:port`
+
+      --peer-connect-timeout <PEER_CONNECT_TIMEOUT>
 
 
---peer-read-write-timeout <PEER_READ_WRITE_TIMEOUT>
+      --peer-read-write-timeout <PEER_READ_WRITE_TIMEOUT>
 
 
---peer-keep-alive-interval <PEER_KEEP_ALIVE_INTERVAL>
+      --peer-keep-alive-interval <PEER_KEEP_ALIVE_INTERVAL>
 
 
---index-capacity <INDEX_CAPACITY>
-        Estimated info-hash index capacity
+      --index-capacity <INDEX_CAPACITY>
+          Estimated info-hash index capacity
 
-        [default: 1000]
+          [default: 1000]
 
---add-torrent-timeout <ADD_TORRENT_TIMEOUT>
-        Max time to handle each torrent
+      --add-torrent-timeout <ADD_TORRENT_TIMEOUT>
+          Max time to handle each torrent
 
-        [default: 10]
+          [default: 10]
 
---sleep <SLEEP>
-        Crawl loop delay in seconds
+      --sleep <SLEEP>
+          Crawl loop delay in seconds
 
-        [default: 300]
+          [default: 300]
 
---upload-limit <UPLOAD_LIMIT>
-        Limit upload speed (b/s)
+      --upload-limit <UPLOAD_LIMIT>
+          Limit upload speed (b/s)
 
---download-limit <DOWNLOAD_LIMIT>
-        Limit download speed (b/s)
+      --download-limit <DOWNLOAD_LIMIT>
+          Limit download speed (b/s)
 
--h, --help
-        Print help (see a summary with '-h')
+  -h, --help
+          Print help (see a summary with '-h')
 
--V, --version
-        Print version
+  -V, --version
+          Print version
 ```

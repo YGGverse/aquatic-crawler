@@ -33,6 +33,22 @@ pub struct Argument {
     #[arg(long)]
     pub initial_peer: Vec<String>,
 
+    /// File path to export RSS feed
+    #[arg(long)]
+    pub export_rss: Option<String>,
+
+    /// Custom title for RSS feed (channel)
+    #[arg(long, default_value_t = String::from("aquatic-crawler"))]
+    pub export_rss_title: String,
+
+    /// Custom link for RSS feed (channel)
+    #[arg(long)]
+    pub export_rss_link: Option<String>,
+
+    /// Custom description for RSS feed (channel)
+    #[arg(long)]
+    pub export_rss_description: Option<String>,
+
     /// Enable DHT resolver
     #[arg(long, default_value_t = false)]
     pub enable_dht: bool,
@@ -76,7 +92,7 @@ pub struct Argument {
     pub preload_max_filecount: Option<usize>,
 
     /// Save resolved torrent files to the `storage` location
-    #[arg(long, default_value_t = true)]
+    #[arg(long, default_value_t = false)]
     pub save_torrents: bool,
 
     /// Use `socks5://[username:password@]host:port`
