@@ -12,9 +12,9 @@ pub struct Value {
 pub struct Index {
     index: HashMap<String, Value>,
     /// Track index changes to prevent extra disk write operations (safe SSD life)
-    /// * useful in the static RSS feed generation case, if enabled.
+    /// * useful in the static RSS feed generation case, if enabled
     is_changed: bool,
-    /// Store the index value in memory only when it is in use by the argument options.
+    /// Store the index value in memory only when it is in use by the init options
     has_name: bool,
 }
 
