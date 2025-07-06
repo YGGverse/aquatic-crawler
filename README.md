@@ -23,7 +23,7 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
         * [ ] remote URL
 * Export options
     * [x] File system (`--storage`)
-        * [x] resolve infohash to the `.torrent` file (`--save-torrents`)
+        * [x] resolve infohash to the `.torrent` file (`--export-torrents`)
         * [x] download content files match the regex pattern (`--preload-regex`)
     * [x] RSS feed (includes resolved torrent meta and magnet links to download)
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search
@@ -76,6 +76,9 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
       --initial-peer <INITIAL_PEER>
           Define initial peer(s) to preload the `.torrent` files info
 
+      --export-torrents <EXPORT_TORRENTS>
+          Save resolved torrent files to given directory
+
       --export-rss <EXPORT_RSS>
           File path to export RSS feed
 
@@ -120,9 +123,6 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 
       --preload-max-filecount <PRELOAD_MAX_FILECOUNT>
           Max count of preloaded files per torrent (match `preload_regex`)
-
-      --save-torrents
-          Save resolved torrent files to the `storage` location
 
       --proxy-url <PROXY_URL>
           Use `socks5://[username:password@]host:port`

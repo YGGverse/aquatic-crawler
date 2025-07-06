@@ -33,6 +33,10 @@ pub struct Argument {
     #[arg(long)]
     pub initial_peer: Vec<String>,
 
+    /// Save resolved torrent files to given directory
+    #[arg(long)]
+    pub export_torrents: Option<String>,
+
     /// File path to export RSS feed
     #[arg(long)]
     pub export_rss: Option<String>,
@@ -90,10 +94,6 @@ pub struct Argument {
     /// Max count of preloaded files per torrent (match `preload_regex`)
     #[arg(long)]
     pub preload_max_filecount: Option<usize>,
-
-    /// Save resolved torrent files to the `storage` location
-    #[arg(long, default_value_t = false)]
-    pub save_torrents: bool,
 
     /// Use `socks5://[username:password@]host:port`
     #[arg(long)]

@@ -5,6 +5,7 @@ mod index;
 mod peers;
 mod rss;
 mod storage;
+mod torrent;
 mod trackers;
 
 use anyhow::Result;
@@ -13,6 +14,7 @@ use index::Index;
 use rss::Rss;
 use std::{collections::HashSet, num::NonZero, time::Duration};
 use storage::Storage;
+use torrent::Torrent;
 use url::Url;
 
 #[tokio::main]
@@ -30,6 +32,7 @@ async fn main() -> Result<()> {
     let peers = peers::Peers::init(&arg.initial_peer)?;
     let storage = Storage::init(&arg.storage, arg.clear)?;
     let trackers = trackers::Trackers::init(&arg.torrent_tracker)?;
+    let torrent = arg.export_torrents.map(|p| Torrent::init(&p).unwrap());
     let preload_regex = arg.preload_regex.map(|ref r| regex::Regex::new(r).unwrap());
     let session = librqbit::Session::new_with_opts(
         storage.path(),
@@ -140,17 +143,9 @@ async fn main() -> Result<()> {
                                                 }
                                             }
                                         }
-                                        // dump info-hash to the torrent file
-                                        if arg.save_torrents {
-                                            save_torrent_file(
-                                                &storage,
-                                                &debug,
-                                                &i,
-                                                &m.torrent_bytes,
-                                            )
+                                        if let Some(ref t) = torrent {
+                                            save_torrent_file(t, &debug, &i, &m.torrent_bytes)
                                         }
-                                        // @TODO
-                                        // use `r.info` for Memory, SQLite, Manticore and other alternative storage type
                                         m.info.name.as_ref().map(|n|n.to_string())
                                     })?;
                                     session.update_only_files(&mt, &only_files).await?;
@@ -167,8 +162,8 @@ async fn main() -> Result<()> {
                                     index.insert(i, only_files_size, name)
                                 }
                                 Ok(AddTorrentResponse::ListOnly(r)) => {
-                                    if arg.save_torrents {
-                                        save_torrent_file(&storage, &debug, &i, &r.torrent_bytes)
+                                    if let Some(ref t) = torrent {
+                                        save_torrent_file(t, &debug, &i, &r.torrent_bytes)
                                     }
 
                                     // @TODO
@@ -220,14 +215,14 @@ async fn main() -> Result<()> {
     }
 }
 
-fn save_torrent_file(s: &Storage, d: &Debug, i: &str, b: &[u8]) {
-    if s.torrent_exists(i) {
-        d.info(&format!("Torrent file `{i}` already exists, skip"))
-    } else {
-        match s.save_torrent(i, b) {
-            Ok(r) => d.info(&format!("Add torrent file `{}`", r.to_string_lossy())),
-            Err(e) => d.error(&e.to_string()),
-        }
+/// Shared handler function to save resolved torrents as file
+fn save_torrent_file(t: &Torrent, d: &Debug, i: &str, b: &[u8]) {
+    match t.persist(i, b) {
+        Ok(r) => match r {
+            Some(p) => d.info(&format!("Add torrent file `{}`", p.to_string_lossy())),
+            None => d.info(&format!("Torrent file `{i}` already exists")),
+        },
+        Err(e) => d.error(&format!("Error on save torrent file `{i}`: {e}")),
     }
 }
 
