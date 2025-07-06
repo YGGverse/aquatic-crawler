@@ -64,7 +64,7 @@ async fn main() -> Result<()> {
 
     // begin
     debug.info("Crawler started");
-    let mut index = Index::init(config.index_capacity);
+    let mut index = Index::init(config.index_capacity, config.export_rss.is_some());
     loop {
         debug.info("Index queue begin...");
         index.refresh();

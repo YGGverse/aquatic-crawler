@@ -14,13 +14,17 @@ pub struct Index {
     /// Track index changes to prevent extra disk write operations (safe SSD life)
     /// * useful in the static RSS feed generation case, if enabled.
     is_changed: bool,
+    /// Store index value in memory only on it is in use
+    /// by the externally defined argument options.
+    has_name: bool,
 }
 
 impl Index {
-    pub fn init(capacity: usize) -> Self {
+    pub fn init(capacity: usize, has_name: bool) -> Self {
         Self {
             index: HashMap::with_capacity(capacity),
             is_changed: false,
+            has_name,
         }
     }
 
@@ -52,7 +56,7 @@ impl Index {
                 Value {
                     time: Utc::now(),
                     node,
-                    name,
+                    name: if self.has_name { name } else { None },
                 },
             )
             .is_none()
