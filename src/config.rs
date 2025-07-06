@@ -2,7 +2,7 @@ use clap::Parser;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
-pub struct Argument {
+pub struct Config {
     /// Debug level
     ///
     /// * `e` - error
