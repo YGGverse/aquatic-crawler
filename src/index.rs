@@ -14,8 +14,7 @@ pub struct Index {
     /// Track index changes to prevent extra disk write operations (safe SSD life)
     /// * useful in the static RSS feed generation case, if enabled.
     is_changed: bool,
-    /// Store index value in memory only on it is in use
-    /// by the externally defined argument options.
+    /// Store the index value in memory only when it is in use by the argument options.
     has_name: bool,
 }
 
