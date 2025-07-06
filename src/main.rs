@@ -8,15 +8,10 @@ mod storage;
 mod trackers;
 
 use anyhow::Result;
-use chrono::Utc;
 use debug::Debug;
 use index::Index;
 use rss::Rss;
-use std::{
-    collections::{HashMap, HashSet},
-    num::NonZero,
-    time::Duration,
-};
+use std::{collections::HashSet, num::NonZero, time::Duration};
 use storage::Storage;
 use url::Url;
 
@@ -64,11 +59,10 @@ async fn main() -> Result<()> {
 
     // begin
     debug.info("Crawler started");
-    // collect processed info hashes to skip on the next iterations (for this session)
-    // * also contains optional meta info to export index as RSS or any other format
-    let mut index = HashMap::with_capacity(arg.index_capacity);
+    let mut index = Index::init(arg.index_capacity);
     loop {
         debug.info("Index queue begin...");
+        index.refresh();
         for source in &arg.infohash_file {
             debug.info(&format!("Index source `{source}`..."));
             // grab latest info-hashes from this source
@@ -77,7 +71,7 @@ async fn main() -> Result<()> {
                 Ok(infohashes) => {
                     for i in infohashes {
                         // is already indexed?
-                        if index.contains_key(&i) {
+                        if index.has(&i) {
                             continue;
                         }
                         debug.info(&format!("Index `{i}`..."));
@@ -170,14 +164,7 @@ async fn main() -> Result<()> {
                                     // cleanup irrelevant files (see rqbit#408)
                                     storage.cleanup(&i, Some(only_files_keep))?;
 
-                                    index.insert(
-                                        i,
-                                        Index {
-                                            time: Utc::now(),
-                                            node: only_files_size,
-                                            name,
-                                        },
-                                    );
+                                    index.insert(i, only_files_size, name)
                                 }
                                 Ok(AddTorrentResponse::ListOnly(r)) => {
                                     if arg.save_torrents {
@@ -188,14 +175,7 @@ async fn main() -> Result<()> {
                                     // use `r.info` for Memory, SQLite,
                                     // Manticore and other alternative storage type
 
-                                    index.insert(
-                                        i,
-                                        Index {
-                                            time: Utc::now(),
-                                            node: 0,
-                                            name: r.info.name.map(|n| n.to_string()),
-                                        },
-                                    );
+                                    index.insert(i, 0, r.info.name.map(|n| n.to_string()))
                                 }
                                 // unexpected as should be deleted
                                 Ok(AddTorrentResponse::AlreadyManaged(..)) => panic!(),
@@ -208,7 +188,9 @@ async fn main() -> Result<()> {
                 Err(e) => debug.error(&format!("API issue for `{source}`: `{e}`")),
             }
         }
-        if let Some(ref export_rss) = arg.export_rss {
+        if let Some(ref export_rss) = arg.export_rss
+            && index.is_changed()
+        {
             let mut rss = Rss::new(
                 export_rss,
                 &arg.export_rss_title,
@@ -216,7 +198,7 @@ async fn main() -> Result<()> {
                 &arg.export_rss_description,
                 Some(trackers.clone()),
             )?;
-            for (k, v) in &index {
+            for (k, v) in index.list() {
                 rss.push(
                     k,
                     v.name.as_ref().unwrap_or(k),
@@ -226,10 +208,7 @@ async fn main() -> Result<()> {
             }
             rss.commit()?
         }
-        if arg
-            .preload_total_size
-            .is_some_and(|s| index.values().map(|i| i.node).sum::<u64>() > s)
-        {
+        if arg.preload_total_size.is_some_and(|s| index.nodes() > s) {
             panic!("Preload content size {} bytes reached!", 0)
         }
         debug.info(&format!(
