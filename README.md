@@ -25,7 +25,7 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
     * [x] File system (`--storage`)
         * [x] resolve infohash to the `.torrent` file (`--save-torrents`)
         * [x] download content files match the regex pattern (`--preload-regex`)
-    * [x] RSS feed export
+    * [x] RSS feed (includes resolved torrent meta and magnet links to download)
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search
     * [ ] SQLite
 
