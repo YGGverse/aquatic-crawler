@@ -1,11 +1,7 @@
-use chrono::{DateTime, Utc};
-use std::collections::HashMap;
+mod value;
 
-pub struct Value {
-    pub time: DateTime<Utc>,
-    pub node: u64,
-    pub name: Option<String>,
-}
+use std::collections::HashMap;
+use value::Value;
 
 /// Collect processed info hashes to skip on the next iterations (for this session)
 /// * also contains optional meta info to export index as RSS or any other format
@@ -52,11 +48,7 @@ impl Index {
             .index
             .insert(
                 infohash,
-                Value {
-                    time: Utc::now(),
-                    node,
-                    name: if self.has_name { name } else { None },
-                },
+                Value::new(node, if self.has_name { name } else { None }),
             )
             .is_none()
         {

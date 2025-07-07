@@ -198,7 +198,7 @@ async fn main() -> Result<()> {
             for (k, v) in index.list() {
                 rss.push(
                     k,
-                    v.name.as_ref().unwrap_or(k),
+                    v.name().unwrap_or(k),
                     None, // @TODO
                     Some(&v.time.to_rfc2822()),
                 )?
