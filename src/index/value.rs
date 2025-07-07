@@ -6,22 +6,28 @@ const NAME_MAX_LEN: usize = 125; // + 3 bytes for `...` offset @TODO optional
 pub struct Value {
     pub time: DateTime<Utc>,
     pub node: u64,
-    /// Isolate by applying internal filter on value set
+    // Isolate by applying internal filter on value set
+    length: Option<u64>,
     name: Option<String>,
 }
 
 impl Value {
     /// Create new `Self` with current timestamp
-    pub fn new(node: u64, name: Option<String>) -> Self {
+    pub fn new(node: u64, name: Option<String>, length: Option<u64>) -> Self {
         Self {
             time: Utc::now(),
             node,
+            length,
             name: filter_name(name),
         }
     }
     /// Get reference to the safely constructed `name` member
     pub fn name(&self) -> Option<&String> {
         self.name.as_ref()
+    }
+    /// Get reference to the safely constructed `length` member
+    pub fn length(&self) -> Option<u64> {
+        self.length
     }
 }
 

@@ -59,7 +59,7 @@ impl Rss {
         &mut self,
         infohash: &str,
         title: &str,
-        description: Option<&str>,
+        description: Option<String>,
         pub_date: Option<&str>,
     ) -> Result<()> {
         self.file.write_all(
@@ -72,7 +72,7 @@ impl Rss {
         )?;
         if let Some(s) = description {
             self.file.write_all(b"<description>")?;
-            self.file.write_all(escape(s).as_bytes())?;
+            self.file.write_all(escape(&s).as_bytes())?;
             self.file.write_all(b"</description>")?
         }
         if let Some(s) = pub_date {

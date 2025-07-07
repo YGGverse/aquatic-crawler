@@ -1,6 +1,7 @@
 mod api;
 mod config;
 mod debug;
+mod format;
 mod index;
 mod peers;
 mod preload;
@@ -11,6 +12,7 @@ mod trackers;
 use anyhow::Result;
 use config::Config;
 use debug::Debug;
+use format::Format;
 use index::Index;
 use peers::Peers;
 use rss::Rss;
@@ -73,7 +75,11 @@ async fn main() -> Result<()> {
 
     // begin
     debug.info("Crawler started");
-    let mut index = Index::init(config.index_capacity, config.export_rss.is_some());
+    let mut index = Index::init(
+        config.index_capacity,
+        config.export_rss.is_some(),
+        config.export_rss.is_some(),
+    );
     loop {
         debug.info("Index queue begin...");
         index.refresh();
@@ -127,7 +133,7 @@ async fn main() -> Result<()> {
                                         config.preload_max_filecount.unwrap_or_default(),
                                     );
                                     mt.wait_until_initialized().await?;
-                                    let name = mt.with_metadata(|m| {
+                                    let (name, length) = mt.with_metadata(|m| {
                                         // init preload files list
                                         if let Some(ref p) = preload {
                                             for (id, info) in m.file_infos.iter().enumerate() {
@@ -160,7 +166,7 @@ async fn main() -> Result<()> {
                                         if let Some(ref t) = torrent {
                                             save_torrent_file(t, &debug, &i, &m.torrent_bytes)
                                         }
-                                        m.info.name.as_ref().map(|n|n.to_string())
+                                        (m.info.name.as_ref().map(|n|n.to_string()), m.info.length)
                                     })?;
                                     session.update_only_files(&mt, &only_files).await?;
                                     session.unpause(&mt).await?;
@@ -175,7 +181,7 @@ async fn main() -> Result<()> {
                                         p.cleanup(&i, Some(only_files_keep))?
                                     }
 
-                                    index.insert(i, only_files_size, name)
+                                    index.insert(i, only_files_size, name, length)
                                 }
                                 Ok(AddTorrentResponse::ListOnly(r)) => {
                                     if let Some(ref t) = torrent {
@@ -186,7 +192,12 @@ async fn main() -> Result<()> {
                                     // use `r.info` for Memory, SQLite,
                                     // Manticore and other alternative storage type
 
-                                    index.insert(i, 0, r.info.name.map(|n| n.to_string()))
+                                    index.insert(
+                                        i,
+                                        0,
+                                        r.info.name.map(|n| n.to_string()),
+                                        r.info.length,
+                                    )
                                 }
                                 // unexpected as should be deleted
                                 Ok(AddTorrentResponse::AlreadyManaged(..)) => panic!(),
@@ -213,7 +224,7 @@ async fn main() -> Result<()> {
                 rss.push(
                     k,
                     v.name().unwrap_or(k),
-                    None, // @TODO
+                    v.length().map(|l| l.bytes()),
                     Some(&v.time.to_rfc2822()),
                 )?
             }

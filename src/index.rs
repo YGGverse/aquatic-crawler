@@ -12,14 +12,16 @@ pub struct Index {
     is_changed: bool,
     /// Store the index value in memory only when it is in use by the init options
     has_name: bool,
+    has_length: bool,
 }
 
 impl Index {
-    pub fn init(capacity: usize, has_name: bool) -> Self {
+    pub fn init(capacity: usize, has_name: bool, has_length: bool) -> Self {
         Self {
             index: HashMap::with_capacity(capacity),
             is_changed: false,
             has_name,
+            has_length,
         }
     }
 
@@ -43,12 +45,22 @@ impl Index {
         self.index.values().map(|i| i.node).sum::<u64>()
     }
 
-    pub fn insert(&mut self, infohash: String, node: u64, name: Option<String>) {
+    pub fn insert(
+        &mut self,
+        infohash: String,
+        node: u64,
+        name: Option<String>,
+        length: Option<u64>,
+    ) {
         if self
             .index
             .insert(
                 infohash,
-                Value::new(node, if self.has_name { name } else { None }),
+                Value::new(
+                    node,
+                    if self.has_name { name } else { None },
+                    if self.has_length { length } else { None },
+                ),
             )
             .is_none()
         {
