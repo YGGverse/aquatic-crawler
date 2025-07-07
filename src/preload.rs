@@ -8,7 +8,7 @@ pub struct Preload {
 }
 
 impl Preload {
-    pub fn init(directory: &str, regex: Option<&str>, clear: bool) -> Result<Self> {
+    pub fn init(directory: &str, regex: Option<String>, clear: bool) -> Result<Self> {
         let path = PathBuf::from_str(directory)?;
         if let Ok(t) = fs::metadata(&path) {
             if t.is_file() {
@@ -28,7 +28,7 @@ impl Preload {
         fs::create_dir_all(&path)?;
         Ok(Self {
             path,
-            regex: regex.map(|r| Regex::new(r).unwrap()),
+            regex: regex.map(|r| Regex::new(&r).unwrap()),
         })
     }
 

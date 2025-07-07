@@ -33,7 +33,7 @@ async fn main() -> Result<()> {
     let peers = peers::Peers::init(&config.initial_peer)?;
     let preload = config
         .preload
-        .map(|ref p| Preload::init(p, config.preload_regex.as_deref(), config.clear).unwrap());
+        .map(|ref p| Preload::init(p, config.preload_regex, config.clear).unwrap());
     let trackers = Trackers::init(&config.tracker)?;
     let torrent = config.export_torrents.map(|p| Torrent::init(&p).unwrap());
     let session = librqbit::Session::new_with_opts(
