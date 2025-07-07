@@ -25,9 +25,6 @@ impl Debug {
     }
 }
 
-fn now() -> u128 {
-    std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
-        .as_millis()
+fn now() -> String {
+    chrono::Local::now().to_rfc3339()
 }
