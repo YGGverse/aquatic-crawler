@@ -15,6 +15,7 @@ use preload::Preload;
 use rss::Rss;
 use std::{collections::HashSet, num::NonZero, path::PathBuf, time::Duration};
 use torrent::Torrent;
+use trackers::Trackers;
 use url::Url;
 
 #[tokio::main]
@@ -32,12 +33,9 @@ async fn main() -> Result<()> {
     let peers = peers::Peers::init(&config.initial_peer)?;
     let preload = config
         .preload
-        .map(|ref p| Preload::init(p, config.clear).unwrap());
-    let trackers = trackers::Trackers::init(&config.tracker)?;
+        .map(|ref p| Preload::init(p, config.preload_regex.as_deref(), config.clear).unwrap());
+    let trackers = Trackers::init(&config.tracker)?;
     let torrent = config.export_torrents.map(|p| Torrent::init(&p).unwrap());
-    let preload_regex = config
-        .preload_regex
-        .map(|ref r| regex::Regex::new(r).unwrap());
     let session = librqbit::Session::new_with_opts(
         match preload {
             Some(ref p) => p.path(),
@@ -99,7 +97,7 @@ async fn main() -> Result<()> {
                                     overwrite: true,
                                     disable_trackers: trackers.is_empty(),
                                     initial_peers: peers.initial_peers(),
-                                    list_only: preload_regex.is_none(),
+                                    list_only: preload.as_ref().is_none_or(|p| p.regex.is_none()),
                                     // it is important to blacklist all files preload until initiation
                                     only_files: Some(Vec::with_capacity(
                                         config.preload_max_filecount.unwrap_or_default(),
@@ -128,11 +126,9 @@ async fn main() -> Result<()> {
                                     mt.wait_until_initialized().await?;
                                     let name = mt.with_metadata(|m| {
                                         // init preload files list
-                                        if let Some(ref regex) = preload_regex {
+                                        if let Some(ref p) = preload {
                                             for (id, info) in m.file_infos.iter().enumerate() {
-                                                if regex.is_match(
-                                                    info.relative_filename.to_str().unwrap(),
-                                                ) {
+                                                if p.matches(info.relative_filename.to_str().unwrap()) {
                                                     if config.preload_max_filesize.is_some_and(
                                                         |limit| only_files_size + info.len > limit,
                                                     ) {

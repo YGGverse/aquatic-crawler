@@ -1,17 +1,21 @@
 use anyhow::{Result, bail};
+use regex::Regex;
 use std::{fs, path::PathBuf, str::FromStr};
 
-pub struct Preload(PathBuf);
+pub struct Preload {
+    path: PathBuf,
+    pub regex: Option<Regex>,
+}
 
 impl Preload {
-    pub fn init(directory: &str, clear: bool) -> Result<Self> {
-        let p = PathBuf::from_str(directory)?;
-        if let Ok(t) = fs::metadata(&p) {
+    pub fn init(directory: &str, regex: Option<&str>, clear: bool) -> Result<Self> {
+        let path = PathBuf::from_str(directory)?;
+        if let Ok(t) = fs::metadata(&path) {
             if t.is_file() {
                 bail!("Storage destination is not directory!");
             }
             if t.is_dir() && clear {
-                for i in fs::read_dir(&p)? {
+                for i in fs::read_dir(&path)? {
                     let r = i?.path();
                     if r.is_dir() {
                         fs::remove_dir_all(&r)?;
@@ -21,13 +25,16 @@ impl Preload {
                 }
             }
         }
-        fs::create_dir_all(&p)?;
-        Ok(Self(p))
+        fs::create_dir_all(&path)?;
+        Ok(Self {
+            path,
+            regex: regex.map(|r| Regex::new(r).unwrap()),
+        })
     }
 
     pub fn output_folder(&self, infohash: &str, create: bool) -> Result<String> {
         let mut p = PathBuf::new();
-        p.push(&self.0);
+        p.push(&self.path);
         p.push(infohash);
         if p.is_file() {
             bail!("File destination is not directory!");
@@ -43,7 +50,7 @@ impl Preload {
 
     pub fn absolute(&self, infohash: &str, file: &PathBuf) -> PathBuf {
         let mut p = PathBuf::new();
-        p.push(&self.0);
+        p.push(&self.path);
         p.push(infohash);
         p.push(file);
         p
@@ -62,6 +69,10 @@ impl Preload {
     }
 
     pub fn path(&self) -> PathBuf {
-        self.0.clone()
+        self.path.clone()
+    }
+
+    pub fn matches(&self, pattern: &str) -> bool {
+        self.regex.as_ref().is_some_and(|r| r.is_match(pattern))
     }
 }
