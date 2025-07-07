@@ -14,7 +14,7 @@ impl Trackers {
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
-    pub fn clone(&self) -> HashSet<Url> {
-        self.0.clone()
+    pub fn list(&self) -> &HashSet<Url> {
+        &self.0
     }
 }

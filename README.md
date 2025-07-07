@@ -87,6 +87,9 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.json\
       --export-rss-description <EXPORT_RSS_DESCRIPTION>
           Custom description for RSS feed (channel)
 
+      --export-trackers
+          Appends `--tracker` value to magnets and torrents
+
       --enable-dht
           Enable DHT resolver
 

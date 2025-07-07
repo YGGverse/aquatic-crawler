@@ -45,6 +45,10 @@ pub struct Config {
     #[arg(long)]
     pub export_rss_description: Option<String>,
 
+    /// Appends `--tracker` value to magnets and torrents
+    #[arg(long, default_value_t = false)]
+    pub export_trackers: bool,
+
     /// Enable DHT resolver
     #[arg(long, default_value_t = false)]
     pub enable_dht: bool,

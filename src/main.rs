@@ -67,7 +67,7 @@ async fn main() -> Result<()> {
                 upload_bps: config.upload_limit.and_then(NonZero::new),
                 download_bps: config.download_limit.and_then(NonZero::new),
             },
-            trackers: trackers.clone(),
+            trackers: trackers.list().clone(),
             ..SessionOptions::default()
         },
     )
@@ -109,7 +109,14 @@ async fn main() -> Result<()> {
                         match time::timeout(
                             Duration::from_secs(config.add_torrent_timeout),
                             session.add_torrent(
-                                AddTorrent::from_url(magnet(&i, None)),
+                                AddTorrent::from_url(magnet(
+                                    &i,
+                                    if config.export_trackers && !trackers.is_empty() {
+                                        Some(trackers.list())
+                                    } else {
+                                        None
+                                    },
+                                )),
                                 Some(AddTorrentOptions {
                                     paused: true, // continue after `only_files` init
                                     overwrite: true,
@@ -227,7 +234,11 @@ async fn main() -> Result<()> {
                 &config.export_rss_title,
                 &config.export_rss_link,
                 &config.export_rss_description,
-                Some(trackers.clone()),
+                if config.export_trackers && !trackers.is_empty() {
+                    Some(trackers.list().clone())
+                } else {
+                    None
+                },
             )?;
             for (k, v) in index.list() {
                 rss.push(
