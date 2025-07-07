@@ -240,10 +240,10 @@ async fn main() -> Result<()> {
 /// Shared handler function to save resolved torrents as file
 fn save_torrent_file(t: &Torrent, d: &Debug, i: &str, b: &[u8]) {
     match t.persist(i, b) {
-        Ok(r) => match r {
-            Some(p) => d.info(&format!("Add torrent file `{}`", p.to_string_lossy())),
-            None => d.info(&format!("Torrent file `{i}` already exists")),
-        },
+        Ok(r) => d.info(&match r {
+            Some(p) => format!("Add torrent file `{}`", p.to_string_lossy()),
+            None => format!("Torrent file `{i}` already exists"),
+        }),
         Err(e) => d.error(&format!("Error on save torrent file `{i}`: {e}")),
     }
 }
