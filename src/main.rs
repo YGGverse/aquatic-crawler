@@ -9,9 +9,10 @@ mod torrent;
 mod trackers;
 
 use anyhow::Result;
+use config::Config;
 use debug::Debug;
 use index::Index;
-use preload::Preload;
+use peers::Peers;
 use rss::Rss;
 use std::{collections::HashSet, num::NonZero, path::PathBuf, time::Duration};
 use torrent::Torrent;
@@ -28,20 +29,17 @@ async fn main() -> Result<()> {
     use tokio::time;
 
     // init components
-    let config = config::Config::parse();
+    let config = Config::parse();
     let debug = Debug::init(&config.debug)?;
-    let peers = peers::Peers::init(&config.initial_peer)?;
-    let preload = config.preload.map(|ref p| {
-        Preload::init(
-            p,
-            config.preload_regex,
-            config.preload_max_filecount,
-            config.preload_max_filesize,
-            config.preload_total_size,
-            config.clear,
-        )
-        .unwrap()
-    });
+    let peers = Peers::init(&config.initial_peer)?;
+    let preload = preload::init(
+        config.preload,
+        config.preload_regex,
+        config.preload_max_filecount,
+        config.preload_max_filesize,
+        config.preload_total_size,
+        config.clear,
+    )?;
     let trackers = Trackers::init(&config.tracker)?;
     let torrent = config.export_torrents.map(|p| Torrent::init(&p).unwrap());
     let session = librqbit::Session::new_with_opts(

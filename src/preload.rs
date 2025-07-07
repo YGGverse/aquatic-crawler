@@ -11,7 +11,7 @@ pub struct Preload {
 }
 
 impl Preload {
-    pub fn init(
+    fn init(
         directory: &str,
         regex: Option<String>,
         max_filecount: Option<usize>,
@@ -88,4 +88,36 @@ impl Preload {
     pub fn matches(&self, pattern: &str) -> bool {
         self.regex.as_ref().is_some_and(|r| r.is_match(pattern))
     }
+}
+
+/// Init `Preload` with validate related argument options
+pub fn init(
+    path: Option<String>,
+    regex: Option<String>,
+    max_filecount: Option<usize>,
+    max_filesize: Option<u64>,
+    total_size: Option<u64>,
+    clear: bool,
+) -> Result<Option<Preload>> {
+    Ok(match path {
+        Some(ref p) => Some(Preload::init(
+            p,
+            regex,
+            max_filecount,
+            max_filesize,
+            total_size,
+            clear,
+        )?),
+        None => {
+            if regex.is_some()
+                || max_filecount.is_some()
+                || max_filesize.is_some()
+                || total_size.is_some()
+                || clear
+            {
+                bail!("`--preload` directory is required for this configuration!")
+            }
+            None
+        }
+    })
 }
