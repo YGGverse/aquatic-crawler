@@ -23,7 +23,8 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
         * [ ] remote URL
 * Export options
     * [x] Content (`--preload`)
-        * [x] download content files match the regex pattern (`--preload-regex`)
+        * [x] data match the regex pattern (`--preload-regex`)
+        * [x] data match limits (see other `--preload-*` options)
     * [x] Resolved `.torrent` files (`--export-torrents`)
     * [x] RSS feed (includes resolved torrent meta and magnet links to download)
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search index
