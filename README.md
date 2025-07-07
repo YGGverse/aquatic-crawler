@@ -19,15 +19,15 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
     * [ ] 2
 * Import sources
     * [x] IPv4 / IPv6 info-hash JSON/API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233))
-        * [x] local file path (`--infohash-file`)
+        * [x] local file path
         * [ ] remote URL
 * Export options
-    * [x] File system (`--storage`)
-        * [x] resolve infohash to the `.torrent` file (`--export-torrents`)
+    * [x] Content (`--preload`)
         * [x] download content files match the regex pattern (`--preload-regex`)
+    * [x] Resolved `.torrent` files (`--export-torrents`)
     * [x] RSS feed (includes resolved torrent meta and magnet links to download)
-    * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search
-    * [ ] SQLite
+    * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search index
+    * [ ] SQLite database index
 
 ## Install
 
