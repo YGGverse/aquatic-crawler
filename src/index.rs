@@ -80,3 +80,22 @@ impl Index {
         self.is_changed = false
     }
 }
+
+#[test]
+fn test() {
+    use std::{thread::sleep, time::Duration};
+
+    // test values auto-clean by timeout
+    let mut index = Index::init(2, Some(3), false, false);
+
+    index.insert("h1".to_string(), 0, None, None);
+    sleep(Duration::from_secs(1));
+    index.insert("h2".to_string(), 0, None, None);
+
+    index.refresh();
+    assert_eq!(index.len(), 2);
+
+    sleep(Duration::from_secs(2));
+    index.refresh();
+    assert_eq!(index.len(), 1);
+}
