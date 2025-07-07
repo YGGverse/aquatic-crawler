@@ -97,7 +97,7 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.json\
           Enable UPnP
 
       --enable-upload
-          Enable upload
+          Enable upload (share received bytes with BitTorrent network)
 
       --preload <PRELOAD>
           Directory path to store preloaded data (e.g. `.torrent` files)

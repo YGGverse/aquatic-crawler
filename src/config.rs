@@ -57,7 +57,7 @@ pub struct Config {
     #[arg(long, default_value_t = false)]
     pub enable_upnp_port_forwarding: bool,
 
-    /// Enable upload
+    /// Enable upload (share received bytes with BitTorrent network)
     #[arg(long, default_value_t = false)]
     pub enable_upload: bool,
 
