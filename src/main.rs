@@ -3,17 +3,17 @@ mod config;
 mod debug;
 mod index;
 mod peers;
+mod preload;
 mod rss;
-mod storage;
 mod torrent;
 mod trackers;
 
 use anyhow::Result;
 use debug::Debug;
 use index::Index;
+use preload::Preload;
 use rss::Rss;
-use std::{collections::HashSet, num::NonZero, time::Duration};
-use storage::Storage;
+use std::{collections::HashSet, num::NonZero, path::PathBuf, time::Duration};
 use torrent::Torrent;
 use url::Url;
 
@@ -30,14 +30,19 @@ async fn main() -> Result<()> {
     let config = config::Config::parse();
     let debug = Debug::init(&config.debug)?;
     let peers = peers::Peers::init(&config.initial_peer)?;
-    let storage = Storage::init(&config.storage, config.clear)?;
-    let trackers = trackers::Trackers::init(&config.torrent_tracker)?;
+    let preload = config
+        .preload
+        .map(|ref p| Preload::init(p, config.clear).unwrap());
+    let trackers = trackers::Trackers::init(&config.tracker)?;
     let torrent = config.export_torrents.map(|p| Torrent::init(&p).unwrap());
     let preload_regex = config
         .preload_regex
         .map(|ref r| regex::Regex::new(r).unwrap());
     let session = librqbit::Session::new_with_opts(
-        storage.path(),
+        match preload {
+            Some(ref p) => p.path(),
+            None => PathBuf::new(),
+        },
         SessionOptions {
             connect: Some(ConnectionOptions {
                 enable_tcp: config.enable_tcp,
@@ -68,7 +73,10 @@ async fn main() -> Result<()> {
     loop {
         debug.info("Index queue begin...");
         index.refresh();
-        for source in &config.infohash_file {
+        for source in &config.infohash {
+            if source.contains("://") {
+                todo!("URL sources yet not supported")
+            }
             debug.info(&format!("Index source `{source}`..."));
             // grab latest info-hashes from this source
             // * aquatic server may update the stats at this moment, handle result manually
@@ -98,7 +106,9 @@ async fn main() -> Result<()> {
                                     )),
                                     // the destination folder to preload files match `only_files_regex`
                                     // * e.g. images for audio albums
-                                    output_folder: storage.output_folder(&i, true).ok(),
+                                    output_folder: preload
+                                        .as_ref()
+                                        .map(|p| p.output_folder(&i, true).unwrap()),
                                     ..Default::default()
                                 }),
                             ),
@@ -140,7 +150,10 @@ async fn main() -> Result<()> {
                                                         break;
                                                     }
                                                     only_files_size += info.len;
-                                                    only_files_keep.push(storage.absolute(&i, &info.relative_filename));
+                                                    if let Some(ref p) = preload {
+                                                        only_files_keep.push(
+                                                            p.absolute(&i, &info.relative_filename))
+                                                    }
                                                     only_files.insert(id);
                                                 }
                                             }
@@ -159,7 +172,9 @@ async fn main() -> Result<()> {
                                         .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                         .await?;
                                     // cleanup irrelevant files (see rqbit#408)
-                                    storage.cleanup(&i, Some(only_files_keep))?;
+                                    if let Some(p) = &preload {
+                                        p.cleanup(&i, Some(only_files_keep))?
+                                    }
 
                                     index.insert(i, only_files_size, name)
                                 }

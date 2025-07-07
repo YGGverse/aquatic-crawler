@@ -15,19 +15,15 @@ pub struct Config {
     #[arg(long, default_value_t = false)]
     pub clear: bool,
 
-    /// Absolute filename(s) to the Aquatic tracker info-hash JSON/API
+    /// Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker JSON/API
     ///
     /// * PR#233 feature
     #[arg(long)]
-    pub infohash_file: Vec<String>,
-
-    /// Directory path to store preloaded data (e.g. `.torrent` files)
-    #[arg(long)]
-    pub storage: String,
+    pub infohash: Vec<String>,
 
     /// Define custom tracker(s) to preload the `.torrent` files info
     #[arg(long)]
-    pub torrent_tracker: Vec<String>,
+    pub tracker: Vec<String>,
 
     /// Define initial peer(s) to preload the `.torrent` files info
     #[arg(long)]
@@ -68,6 +64,10 @@ pub struct Config {
     /// Enable upload
     #[arg(long, default_value_t = false)]
     pub enable_upload: bool,
+
+    /// Directory path to store preloaded data (e.g. `.torrent` files)
+    #[arg(long)]
+    pub preload: Option<String>,
 
     /// Preload only files match regex pattern (list only without preload by default)
     /// * see also `preload_max_filesize`, `preload_max_filecount` options

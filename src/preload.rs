@@ -1,11 +1,11 @@
 use anyhow::{Result, bail};
 use std::{fs, path::PathBuf, str::FromStr};
 
-pub struct Storage(PathBuf);
+pub struct Preload(PathBuf);
 
-impl Storage {
-    pub fn init(storage: &str, clear: bool) -> Result<Self> {
-        let p = PathBuf::from_str(storage)?;
+impl Preload {
+    pub fn init(directory: &str, clear: bool) -> Result<Self> {
+        let p = PathBuf::from_str(directory)?;
         if let Ok(t) = fs::metadata(&p) {
             if t.is_file() {
                 bail!("Storage destination is not directory!");

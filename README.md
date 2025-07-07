@@ -38,12 +38,12 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
 ## Usage
 
 ``` bash
-aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
-                --infohash-file   /path/to/info-hash-ipv6.json\
-                --infohash-file   /path/to/another-source.json\
-                --torrent-tracker udp://host1:port\
-                --torrent-tracker udp://host2:port\
-                --storage         /path/to/storage\
+aquatic-crawler --infohash /path/to/info-hash-ipv4.json\
+                --infohash /path/to/info-hash-ipv6.json\
+                --infohash /path/to/another-source.json\
+                --tracker  udp://host1:port\
+                --tracker  udp://host2:port\
+                --preload  /path/to/directory\
                 --enable-tcp
 ```
 
@@ -62,15 +62,12 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
       --clear
           Clear previous index collected on crawl session start
 
-      --infohash-file <INFOHASH_FILE>
-          Absolute filename(s) to the Aquatic tracker info-hash JSON/API
+      --infohash <INFOHASH>
+          Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker JSON/API
 
           * PR#233 feature
 
-      --storage <STORAGE>
-          Directory path to store preloaded data (e.g. `.torrent` files)
-
-      --torrent-tracker <TORRENT_TRACKER>
+      --tracker <TRACKER>
           Define custom tracker(s) to preload the `.torrent` files info
 
       --initial-peer <INITIAL_PEER>
@@ -104,6 +101,9 @@ aquatic-crawler --infohash-file   /path/to/info-hash-ipv4.json\
 
       --enable-upload
           Enable upload
+
+      --preload <PRELOAD>
+          Directory path to store preloaded data (e.g. `.torrent` files)
 
       --preload-regex <PRELOAD_REGEX>
           Preload only files match regex pattern (list only without preload by default)
