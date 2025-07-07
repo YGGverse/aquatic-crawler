@@ -31,9 +31,17 @@ async fn main() -> Result<()> {
     let config = config::Config::parse();
     let debug = Debug::init(&config.debug)?;
     let peers = peers::Peers::init(&config.initial_peer)?;
-    let preload = config
-        .preload
-        .map(|ref p| Preload::init(p, config.preload_regex, config.clear).unwrap());
+    let preload = config.preload.map(|ref p| {
+        Preload::init(
+            p,
+            config.preload_regex,
+            config.preload_max_filecount,
+            config.preload_max_filesize,
+            config.preload_total_size,
+            config.clear,
+        )
+        .unwrap()
+    });
     let trackers = Trackers::init(&config.tracker)?;
     let torrent = config.export_torrents.map(|p| Torrent::init(&p).unwrap());
     let session = librqbit::Session::new_with_opts(
@@ -129,7 +137,7 @@ async fn main() -> Result<()> {
                                         if let Some(ref p) = preload {
                                             for (id, info) in m.file_infos.iter().enumerate() {
                                                 if p.matches(info.relative_filename.to_str().unwrap()) {
-                                                    if config.preload_max_filesize.is_some_and(
+                                                    if p.max_filesize.is_some_and(
                                                         |limit| only_files_size + info.len > limit,
                                                     ) {
                                                         debug.info(&format!(
@@ -137,7 +145,7 @@ async fn main() -> Result<()> {
                                                         ));
                                                         break;
                                                     }
-                                                    if config.preload_max_filecount.is_some_and(
+                                                    if p.max_filecount.is_some_and(
                                                         |limit| only_files.len() + 1 > limit,
                                                     ) {
                                                         debug.info(&format!(
@@ -216,7 +224,10 @@ async fn main() -> Result<()> {
             }
             rss.commit()?
         }
-        if config.preload_total_size.is_some_and(|s| index.nodes() > s) {
+        if preload
+            .as_ref()
+            .is_some_and(|p| p.total_size.is_some_and(|s| index.nodes() > s))
+        {
             panic!("Preload content size {} bytes reached!", 0)
         }
         debug.info(&format!(

@@ -4,11 +4,21 @@ use std::{fs, path::PathBuf, str::FromStr};
 
 pub struct Preload {
     path: PathBuf,
+    pub max_filecount: Option<usize>,
+    pub max_filesize: Option<u64>,
+    pub total_size: Option<u64>,
     pub regex: Option<Regex>,
 }
 
 impl Preload {
-    pub fn init(directory: &str, regex: Option<String>, clear: bool) -> Result<Self> {
+    pub fn init(
+        directory: &str,
+        regex: Option<String>,
+        max_filecount: Option<usize>,
+        max_filesize: Option<u64>,
+        total_size: Option<u64>,
+        clear: bool,
+    ) -> Result<Self> {
         let path = PathBuf::from_str(directory)?;
         if let Ok(t) = fs::metadata(&path) {
             if t.is_file() {
@@ -27,8 +37,11 @@ impl Preload {
         }
         fs::create_dir_all(&path)?;
         Ok(Self {
+            max_filecount,
+            max_filesize,
             path,
             regex: regex.map(|r| Regex::new(&r).unwrap()),
+            total_size,
         })
     }
 
