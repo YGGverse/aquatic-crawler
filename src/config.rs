@@ -117,6 +117,10 @@ pub struct Config {
     #[arg(long, default_value_t = 1000)]
     pub index_capacity: usize,
 
+    /// Remove records from index older than `seconds`
+    #[arg(long)]
+    pub index_timeout: Option<i64>,
+
     /// Max time to handle each torrent
     #[arg(long, default_value_t = 10)]
     pub add_torrent_timeout: u64,

@@ -146,6 +146,9 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.json\
 
           [default: 1000]
 
+      --index-timeout <INDEX_TIMEOUT>
+          Remove records from index older than `seconds`
+
       --add-torrent-timeout <ADD_TORRENT_TIMEOUT>
           Max time to handle each torrent
 

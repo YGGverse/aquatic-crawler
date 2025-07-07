@@ -77,6 +77,7 @@ async fn main() -> Result<()> {
     debug.info("Crawler started");
     let mut index = Index::init(
         config.index_capacity,
+        config.index_timeout,
         config.export_rss.is_some(),
         config.export_rss.is_some(),
     );

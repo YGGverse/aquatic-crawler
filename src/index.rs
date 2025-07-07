@@ -1,5 +1,6 @@
 mod value;
 
+use chrono::{Duration, Utc};
 use std::collections::HashMap;
 use value::Value;
 
@@ -7,6 +8,8 @@ use value::Value;
 /// * also contains optional meta info to export index as RSS or any other format
 pub struct Index {
     index: HashMap<String, Value>,
+    /// Removes outdated values from `index` on `Self::refresh` action
+    timeout: Option<Duration>,
     /// Track index changes to prevent extra disk write operations (safe SSD life)
     /// * useful in the static RSS feed generation case, if enabled
     is_changed: bool,
@@ -16,12 +19,13 @@ pub struct Index {
 }
 
 impl Index {
-    pub fn init(capacity: usize, has_name: bool, has_length: bool) -> Self {
+    pub fn init(capacity: usize, timeout: Option<i64>, has_name: bool, has_length: bool) -> Self {
         Self {
             index: HashMap::with_capacity(capacity),
-            is_changed: false,
-            has_name,
+            timeout: timeout.map(Duration::seconds),
             has_length,
+            has_name,
+            is_changed: false,
         }
     }
 
@@ -69,7 +73,10 @@ impl Index {
     }
 
     pub fn refresh(&mut self) {
+        if let Some(timeout) = self.timeout {
+            let t = Utc::now();
+            self.index.retain(|_, v| t - v.time <= timeout)
+        }
         self.is_changed = false
-        // @TODO implement also index cleanup by Value timeout
     }
 }
