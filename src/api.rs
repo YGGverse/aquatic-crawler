@@ -1,6 +1,9 @@
 /// Parse infohash from the source filepath,
 /// decode JSON to array on success
 pub fn infohashes(path: &str) -> anyhow::Result<Vec<String>> {
+    if path.contains("://") {
+        todo!("URL sources yet not supported")
+    }
     let mut f = std::fs::File::open(path)?;
     let mut s = String::new();
 

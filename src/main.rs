@@ -78,9 +78,6 @@ async fn main() -> Result<()> {
         debug.info("Index queue begin...");
         index.refresh();
         for source in &config.infohash {
-            if source.contains("://") {
-                todo!("URL sources yet not supported")
-            }
             debug.info(&format!("Index source `{source}`..."));
             // grab latest info-hashes from this source
             // * aquatic server may update the stats at this moment, handle result manually
