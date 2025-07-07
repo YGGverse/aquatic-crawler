@@ -17,14 +17,14 @@ impl Preload {
         max_filecount: Option<usize>,
         max_filesize: Option<u64>,
         total_size: Option<u64>,
-        clear: bool,
+        is_clear: bool,
     ) -> Result<Self> {
         let path = PathBuf::from_str(directory)?;
         if let Ok(t) = fs::metadata(&path) {
             if t.is_file() {
                 bail!("Storage destination is not directory!");
             }
-            if t.is_dir() && clear {
+            if t.is_dir() && is_clear {
                 for i in fs::read_dir(&path)? {
                     let r = i?.path();
                     if r.is_dir() {
@@ -97,7 +97,7 @@ pub fn init(
     max_filecount: Option<usize>,
     max_filesize: Option<u64>,
     total_size: Option<u64>,
-    clear: bool,
+    is_clear: bool,
 ) -> Result<Option<Preload>> {
     Ok(match path {
         Some(ref p) => Some(Preload::init(
@@ -106,14 +106,14 @@ pub fn init(
             max_filecount,
             max_filesize,
             total_size,
-            clear,
+            is_clear,
         )?),
         None => {
             if regex.is_some()
                 || max_filecount.is_some()
                 || max_filesize.is_some()
                 || total_size.is_some()
-                || clear
+                || is_clear
             {
                 bail!("`--preload` directory is required for this configuration!")
             }

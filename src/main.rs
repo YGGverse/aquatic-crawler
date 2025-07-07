@@ -38,7 +38,7 @@ async fn main() -> Result<()> {
         config.preload_max_filecount,
         config.preload_max_filesize,
         config.preload_total_size,
-        config.clear,
+        config.preload_clear,
     )?;
     let trackers = Trackers::init(&config.tracker)?;
     let torrent = config.export_torrents.map(|p| Torrent::init(&p).unwrap());

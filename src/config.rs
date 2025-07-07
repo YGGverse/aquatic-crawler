@@ -11,10 +11,6 @@ pub struct Config {
     #[arg(short, long, default_value_t = String::from("ei"))]
     pub debug: String,
 
-    /// Clear previous index collected on crawl session start
-    #[arg(long, default_value_t = false)]
-    pub clear: bool,
-
     /// Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker JSON/API
     ///
     /// * PR#233 feature
@@ -68,6 +64,10 @@ pub struct Config {
     /// Directory path to store preloaded data (e.g. `.torrent` files)
     #[arg(long)]
     pub preload: Option<String>,
+
+    /// Clear previous data collected on crawl session start
+    #[arg(long, default_value_t = false)]
+    pub preload_clear: bool,
 
     /// Preload only files match regex pattern (list only without preload by default)
     /// * see also `preload_max_filesize`, `preload_max_filecount` options

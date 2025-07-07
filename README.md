@@ -59,9 +59,6 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.json\
 
           [default: ei]
 
-      --clear
-          Clear previous index collected on crawl session start
-
       --infohash <INFOHASH>
           Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker JSON/API
 
@@ -104,6 +101,9 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.json\
 
       --preload <PRELOAD>
           Directory path to store preloaded data (e.g. `.torrent` files)
+
+      --preload-clear
+          Clear previous data collected on crawl session start
 
       --preload-regex <PRELOAD_REGEX>
           Preload only files match regex pattern (list only without preload by default)
