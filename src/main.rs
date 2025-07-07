@@ -89,7 +89,16 @@ async fn main() -> Result<()> {
             // * aquatic server may update the stats at this moment, handle result manually
             match api::infohashes(source) {
                 Ok(infohashes) => {
-                    for i in infohashes {
+                    for i in match infohashes {
+                        Some(h) => h,
+                        None => {
+                            // skip without panic
+                            debug.error(&format!(
+                                "The feed `{source}` has an incomplete format (or is still updating); skip."
+                            ));
+                            continue;
+                        }
+                    } {
                         // is already indexed?
                         if index.has(&i) {
                             continue;

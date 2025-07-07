@@ -1,16 +1,10 @@
 /// Parse infohash from the source filepath,
-/// decode JSON to array on success
-pub fn infohashes(path: &str) -> anyhow::Result<Vec<String>> {
+/// decode JSON to array on success, return None if the feed is damaged (incomplete)
+pub fn infohashes(path: &str) -> anyhow::Result<Option<Vec<String>>> {
     if path.contains("://") {
         todo!("URL sources yet not supported")
     }
-    let mut f = std::fs::File::open(path)?;
-    let mut s = String::new();
-
-    use std::io::Read;
-    f.read_to_string(&mut s)?;
-
-    let r: Vec<String> = serde_json::from_str(&s)?;
-
+    let s = std::fs::read_to_string(path)?;
+    let r: Option<Vec<String>> = serde_json::from_str(&s).ok();
     Ok(r)
 }
