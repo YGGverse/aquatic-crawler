@@ -24,9 +24,10 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
 * Export options
     * [x] Content (`--preload`)
         * [x] data match the regex pattern (`--preload-regex`)
-        * [x] data match limits (see other `--preload-*` options)
+        * [x] data match limits (see `--preload-*` options group)
     * [x] Resolved `.torrent` files (`--export-torrents`)
-    * [x] RSS feed (includes resolved torrent meta and magnet links to download)
+    * [x] RSS feed (`--export-rss`) includes resolved torrent meta and magnet links to download
+        * customize feed options with `--export-rss-*` options group
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search index
     * [ ] SQLite database index
 
