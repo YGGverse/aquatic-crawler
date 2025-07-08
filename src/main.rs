@@ -14,6 +14,10 @@ use config::Config;
 use debug::Debug;
 use format::Format;
 use index::Index;
+use librqbit::{
+    AddTorrent, AddTorrentOptions, AddTorrentResponse, ByteBufOwned, ConnectionOptions,
+    PeerConnectionOptions, SessionOptions, TorrentMetaV1Info,
+};
 use peers::Peers;
 use rss::Rss;
 use std::{collections::HashSet, num::NonZero, path::PathBuf, time::Duration};
@@ -24,10 +28,6 @@ use url::Url;
 #[tokio::main]
 async fn main() -> Result<()> {
     use clap::Parser;
-    use librqbit::{
-        AddTorrent, AddTorrentOptions, AddTorrentResponse, ConnectionOptions,
-        PeerConnectionOptions, SessionOptions,
-    };
     use tokio::time;
 
     // init components
@@ -80,6 +80,7 @@ async fn main() -> Result<()> {
         config.index_timeout,
         config.export_rss.is_some(),
         config.export_rss.is_some(),
+        config.export_rss.is_some() && config.index_list,
     );
     loop {
         debug.info("Index queue begin...");
@@ -150,7 +151,7 @@ async fn main() -> Result<()> {
                                 config.preload_max_filecount.unwrap_or_default(),
                             );
                             mt.wait_until_initialized().await?;
-                            let (name, size) = mt.with_metadata(|m| {
+                            let (name, size, list) = mt.with_metadata(|m| {
                                 // init preload files list
                                 if let Some(ref p) = preload {
                                     for (id, info) in m.file_infos.iter().enumerate() {
@@ -184,7 +185,11 @@ async fn main() -> Result<()> {
                                     save_torrent_file(t, &debug, &i, &m.torrent_bytes)
                                 }
 
-                                (m.info.name.as_ref().map(|n| n.to_string()), size(&m.info))
+                                (
+                                    m.info.name.as_ref().map(|n| n.to_string()),
+                                    size(&m.info),
+                                    list(&m.info),
+                                )
                             })?;
                             session.update_only_files(&mt, &only_files).await?;
                             session.unpause(&mt).await?;
@@ -199,7 +204,7 @@ async fn main() -> Result<()> {
                                 p.cleanup(&i, Some(only_files_keep))?
                             }
 
-                            index.insert(i, only_files_size, size, name)
+                            index.insert(i, only_files_size, size, list, name)
                         }
                         Ok(AddTorrentResponse::ListOnly(r)) => {
                             if let Some(ref t) = torrent {
@@ -210,7 +215,13 @@ async fn main() -> Result<()> {
                             // use `r.info` for Memory, SQLite,
                             // Manticore and other alternative storage type
 
-                            index.insert(i, 0, size(&r.info), r.info.name.map(|n| n.to_string()))
+                            index.insert(
+                                i,
+                                0,
+                                size(&r.info),
+                                list(&r.info),
+                                r.info.name.map(|n| n.to_string()),
+                            )
                         }
                         // unexpected as should be deleted
                         Ok(AddTorrentResponse::AlreadyManaged(..)) => panic!(),
@@ -288,7 +299,7 @@ fn magnet(infohash: &str, trackers: Option<&HashSet<Url>>) -> String {
 }
 
 /// Count total size, including torrent files
-fn size(info: &librqbit::TorrentMetaV1Info<librqbit::ByteBufOwned>) -> u64 {
+fn size(info: &TorrentMetaV1Info<ByteBufOwned>) -> u64 {
     let mut t = 0;
     if let Some(l) = info.length {
         t += l
@@ -299,4 +310,19 @@ fn size(info: &librqbit::TorrentMetaV1Info<librqbit::ByteBufOwned>) -> u64 {
         }
     }
     t
+}
+
+fn list(info: &TorrentMetaV1Info<ByteBufOwned>) -> Option<Vec<(String, u64)>> {
+    info.files.as_ref().map(|files| {
+        files
+            .iter()
+            .map(|f| {
+                (
+                    String::from_utf8(f.path.iter().flat_map(|b| b.to_vec()).collect())
+                        .unwrap_or_default(),
+                    f.length,
+                )
+            })
+            .collect()
+    })
 }

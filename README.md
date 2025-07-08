@@ -67,7 +67,7 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
       --infohash <INFOHASH>
           Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API
 
-          * PR#233 feature
+          * PR#233 feature ([Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic))
 
       --tracker <TRACKER>
           Define custom tracker(s) to preload the `.torrent` files info
@@ -148,6 +148,9 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
           Estimated info-hash index capacity
 
           [default: 1000]
+
+      --index-list
+          Index torrent files
 
       --index-timeout <INDEX_TIMEOUT>
           Remove records from index older than `seconds`
