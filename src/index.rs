@@ -65,7 +65,6 @@ impl Index {
         list: Option<Vec<(String, u64)>>,
         name: Option<String>,
     ) {
-        println!("{:?}", &list);
         if self
             .index
             .insert(
