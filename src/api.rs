@@ -1,5 +1,7 @@
 /// Parse infohash from the source filepath,
-/// decode JSON to array on success, return None if the feed file is not reachable
+/// decode hash bytes to String array on success.
+///
+/// * return `None` if the `path` is not reachable
 pub fn get(path: &str) -> Option<Vec<String>> {
     use std::io::Read;
     if path.contains("://") {
