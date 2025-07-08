@@ -10,7 +10,7 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
 > * This crawler can resolve any other `--infohash` source that matches `hash1hash2...` binary format
 > * For more details, see the project [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki)!
 
-## Roadmap
+## Features
 
 > [!TIP]
 > For details on all implemented features, see the [Options](#options) section
