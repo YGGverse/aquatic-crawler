@@ -5,21 +5,20 @@ use info_hash::InfoHash;
 /// decode hash bytes to `InfoHash` array on success.
 ///
 /// * return `None` if the `path` is not reachable
-pub fn get(path: &str) -> Option<Vec<InfoHash>> {
+pub fn get(path: &str, capacity: usize) -> Option<Vec<InfoHash>> {
     use std::io::Read;
     if path.contains("://") {
         todo!("URL sources yet not supported")
     }
     const L: usize = 20; // v1 only
-    let mut r = Vec::new();
+    let mut r = Vec::with_capacity(capacity);
     let mut f = std::fs::File::open(path).ok()?;
     loop {
-        let mut b = vec![0; L];
-        let l = f.read(&mut b).ok()?;
-        if l != L {
+        let mut b = [0; L];
+        if f.read(&mut b).ok()? != L {
             break;
         }
-        r.push(InfoHash::V1(b[..l].to_vec()))
+        r.push(InfoHash::V1(b))
     }
     Some(r)
 }
@@ -33,6 +32,8 @@ fn test() {
         todo!()
     }
 
+    const C: usize = 2;
+
     const P0: &str = "/tmp/aquatic-crawler-api-test-0.bin";
     const P1: &str = "/tmp/aquatic-crawler-api-test-1.bin";
     const P2: &str = "/tmp/aquatic-crawler-api-test-2.bin";
@@ -40,9 +41,9 @@ fn test() {
     fs::write(P0, vec![]).unwrap();
     fs::write(P1, vec![1; 40]).unwrap(); // 20 + 20 bytes
 
-    assert!(get(P0).is_some_and(|b| b.is_empty()));
-    assert!(get(P1).is_some_and(|b| b.len() == 2));
-    assert!(get(P2).is_none());
+    assert!(get(P0, C).is_some_and(|b| b.is_empty()));
+    assert!(get(P1, C).is_some_and(|b| b.len() == 2));
+    assert!(get(P2, C).is_none());
 
     fs::remove_file(P0).unwrap();
     fs::remove_file(P1).unwrap();

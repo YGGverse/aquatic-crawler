@@ -1,5 +1,5 @@
 pub enum InfoHash {
-    V1(Vec<u8>),
+    V1([u8; 20]),
 }
 
 impl std::fmt::Display for InfoHash {

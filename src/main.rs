@@ -88,7 +88,7 @@ async fn main() -> Result<()> {
             debug.info(&format!("Index source `{source}`..."));
             // grab latest info-hashes from this source
             // * aquatic server may update the stats at this moment, handle result manually
-            for i in match api::get(source) {
+            for i in match api::get(source, config.index_capacity) {
                 Some(i) => i,
                 None => {
                     // skip without panic
