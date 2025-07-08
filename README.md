@@ -6,8 +6,9 @@
 
 Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker based on [librqbit](https://github.com/ikatson/rqbit/tree/main/crates/librqbit) API
 
-* this crawler can resolve any other infohash sources in the `hash1hash2...` binary format
-* see project [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki) for more details!
+> [!NOTE]
+> * This crawler can resolve any other infohash sources in the `hash1hash2...` binary format
+> * For more details, see the project [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki)!
 
 ## Roadmap
 
