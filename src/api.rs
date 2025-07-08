@@ -1,17 +1,49 @@
 /// Parse infohash from the source filepath,
 /// decode JSON to array on success, return None if the feed file is not reachable
 pub fn get(path: &str) -> Option<Vec<String>> {
+    use std::io::Read;
     if path.contains("://") {
         todo!("URL sources yet not supported")
     }
-    let s = std::fs::read_to_string(path).ok()?; // is updating?
-    let r: Option<Vec<String>> = serde_json::from_str(&s).ok(); // is incomplete?
-    r
+    const L: usize = 20; // v1 only
+    let mut r = Vec::new();
+    let mut f = std::fs::File::open(path).ok()?;
+    loop {
+        let mut b = vec![0; L];
+        let l = f.read(&mut b).ok()?;
+        if l != L {
+            break;
+        }
+        r.push(
+            b[..l]
+                .iter()
+                .map(|i| format!("{i:02x}"))
+                .collect::<String>(),
+        )
+    }
+    Some(r)
 }
 
 #[test]
 fn test() {
-    assert!(get("test/api/0.json").is_none());
-    assert!(get("test/api/1.json").is_some());
-    assert!(get("test/api/2.json").is_none());
+    use std::fs;
+
+    #[cfg(not(any(target_os = "linux", target_os = "macos",)))]
+    {
+        todo!()
+    }
+
+    const P0: &str = "/tmp/aquatic-crawler-api-test-0.bin";
+    const P1: &str = "/tmp/aquatic-crawler-api-test-1.bin";
+    const P2: &str = "/tmp/aquatic-crawler-api-test-2.bin";
+
+    fs::write(P0, vec![]).unwrap();
+    fs::write(P1, vec![1; 40]).unwrap(); // 20 + 20 bytes
+
+    assert!(get(P0).is_some_and(|b| b.is_empty()));
+    assert!(get(P1).is_some_and(|b| b.len() == 2));
+    assert!(get(P2).is_none());
+
+    fs::remove_file(P0).unwrap();
+    fs::remove_file(P1).unwrap();
 }

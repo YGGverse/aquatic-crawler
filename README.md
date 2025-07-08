@@ -18,7 +18,7 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
     * [x] 1
     * [ ] 2
 * Import sources
-    * [x] IPv4 / IPv6 info-hash JSON/API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233))
+    * [x] IPv4 / IPv6 info-hash binary API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233))
         * [x] local file path
         * [ ] remote URL
 * Export options
@@ -40,9 +40,9 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
 ## Usage
 
 ``` bash
-aquatic-crawler --infohash /path/to/info-hash-ipv4.json\
-                --infohash /path/to/info-hash-ipv6.json\
-                --infohash /path/to/another-source.json\
+aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
+                --infohash /path/to/info-hash-ipv6.bin\
+                --infohash /path/to/another-source.bin\
                 --tracker  udp://host1:port\
                 --tracker  udp://host2:port\
                 --preload  /path/to/directory\
@@ -62,7 +62,7 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.json\
           [default: ei]
 
       --infohash <INFOHASH>
-          Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker JSON/API
+          Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API
 
           * PR#233 feature
 

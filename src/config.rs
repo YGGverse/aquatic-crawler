@@ -11,7 +11,7 @@ pub struct Config {
     #[arg(short, long, default_value_t = String::from("ei"))]
     pub debug: String,
 
-    /// Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker JSON/API
+    /// Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API
     ///
     /// * PR#233 feature
     #[arg(long)]
