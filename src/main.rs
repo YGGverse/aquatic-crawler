@@ -98,6 +98,8 @@ async fn main() -> Result<()> {
                     continue;
                 }
             } {
+                // convert to string once
+                let i = i.to_string();
                 // is already indexed?
                 if index.has(&i) {
                     continue;

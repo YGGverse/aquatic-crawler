@@ -1,8 +1,11 @@
+mod info_hash;
+use info_hash::InfoHash;
+
 /// Parse infohash from the source filepath,
-/// decode hash bytes to String array on success.
+/// decode hash bytes to `InfoHash` array on success.
 ///
 /// * return `None` if the `path` is not reachable
-pub fn get(path: &str) -> Option<Vec<String>> {
+pub fn get(path: &str) -> Option<Vec<InfoHash>> {
     use std::io::Read;
     if path.contains("://") {
         todo!("URL sources yet not supported")
@@ -16,12 +19,7 @@ pub fn get(path: &str) -> Option<Vec<String>> {
         if l != L {
             break;
         }
-        r.push(
-            b[..l]
-                .iter()
-                .map(|i| format!("{i:02x}"))
-                .collect::<String>(),
-        )
+        r.push(InfoHash::V1(b[..l].to_vec()))
     }
     Some(r)
 }
