@@ -35,9 +35,15 @@ impl Value {
 fn filter_name(value: Option<String>) -> Option<String> {
     value.map(|v| {
         if v.len() > NAME_MAX_LEN {
-            format!("{}...", &v[..NAME_MAX_LEN])
+            format!("{}...", sanitize(&v[..NAME_MAX_LEN]))
         } else {
             v
         }
     })
+}
+
+/// Strip tags & bom chars from string
+fn sanitize(value: &str) -> String {
+    use voca_rs::strip::*;
+    strip_tags(&strip_bom(value))
 }
