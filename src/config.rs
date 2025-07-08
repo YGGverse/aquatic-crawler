@@ -13,7 +13,7 @@ pub struct Config {
 
     /// Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API
     ///
-    /// * PR#233 feature
+    /// * PR#233 feature ([Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic))
     #[arg(long)]
     pub infohash: Vec<String>,
 

@@ -18,7 +18,7 @@ Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracke
     * [x] 1
     * [ ] 2
 * Import sources
-    * [x] IPv4 / IPv6 info-hash binary API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233))
+    * [x] IPv4 / IPv6 info-hash binary API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233), [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic))
         * [x] local file path
         * [ ] remote URL
 * Export options
