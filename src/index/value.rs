@@ -7,17 +7,17 @@ pub struct Value {
     pub time: DateTime<Utc>,
     pub node: u64,
     // Isolate by applying internal filter on value set
-    length: Option<u64>,
+    size: Option<u64>,
     name: Option<String>,
 }
 
 impl Value {
     /// Create new `Self` with current timestamp
-    pub fn new(node: u64, name: Option<String>, length: Option<u64>) -> Self {
+    pub fn new(node: u64, size: Option<u64>, name: Option<String>) -> Self {
         Self {
             time: Utc::now(),
             node,
-            length,
+            size,
             name: filter_name(name),
         }
     }
@@ -26,8 +26,8 @@ impl Value {
         self.name.as_ref()
     }
     /// Get reference to the safely constructed `length` member
-    pub fn length(&self) -> Option<u64> {
-        self.length
+    pub fn size(&self) -> Option<u64> {
+        self.size
     }
 }
 

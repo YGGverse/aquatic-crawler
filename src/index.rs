@@ -15,15 +15,15 @@ pub struct Index {
     is_changed: bool,
     /// Store the index value in memory only when it is in use by the init options
     has_name: bool,
-    has_length: bool,
+    has_size: bool,
 }
 
 impl Index {
-    pub fn init(capacity: usize, timeout: Option<i64>, has_name: bool, has_length: bool) -> Self {
+    pub fn init(capacity: usize, timeout: Option<i64>, has_name: bool, has_size: bool) -> Self {
         Self {
             index: HashMap::with_capacity(capacity),
             timeout: timeout.map(Duration::seconds),
-            has_length,
+            has_size,
             has_name,
             is_changed: false,
         }
@@ -49,21 +49,15 @@ impl Index {
         self.index.values().map(|i| i.node).sum::<u64>()
     }
 
-    pub fn insert(
-        &mut self,
-        infohash: String,
-        node: u64,
-        name: Option<String>,
-        length: Option<u64>,
-    ) {
+    pub fn insert(&mut self, infohash: String, node: u64, size: u64, name: Option<String>) {
         if self
             .index
             .insert(
                 infohash,
                 Value::new(
                     node,
+                    if self.has_size { Some(size) } else { None },
                     if self.has_name { name } else { None },
-                    if self.has_length { length } else { None },
                 ),
             )
             .is_none()
@@ -88,9 +82,9 @@ fn test() {
     // test values auto-clean by timeout
     let mut i = Index::init(2, Some(3), false, false);
 
-    i.insert("h1".to_string(), 0, None, None);
+    i.insert("h1".to_string(), 0, 0, None);
     sleep(Duration::from_secs(1));
-    i.insert("h2".to_string(), 0, None, None);
+    i.insert("h2".to_string(), 0, 0, None);
 
     i.refresh();
     assert_eq!(i.len(), 2);

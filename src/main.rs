@@ -150,7 +150,7 @@ async fn main() -> Result<()> {
                                 config.preload_max_filecount.unwrap_or_default(),
                             );
                             mt.wait_until_initialized().await?;
-                            let (name, length) = mt.with_metadata(|m| {
+                            let (name, size) = mt.with_metadata(|m| {
                                 // init preload files list
                                 if let Some(ref p) = preload {
                                     for (id, info) in m.file_infos.iter().enumerate() {
@@ -183,7 +183,8 @@ async fn main() -> Result<()> {
                                 if let Some(ref t) = torrent {
                                     save_torrent_file(t, &debug, &i, &m.torrent_bytes)
                                 }
-                                (m.info.name.as_ref().map(|n| n.to_string()), m.info.length)
+
+                                (m.info.name.as_ref().map(|n| n.to_string()), size(&m.info))
                             })?;
                             session.update_only_files(&mt, &only_files).await?;
                             session.unpause(&mt).await?;
@@ -198,7 +199,7 @@ async fn main() -> Result<()> {
                                 p.cleanup(&i, Some(only_files_keep))?
                             }
 
-                            index.insert(i, only_files_size, name, length)
+                            index.insert(i, only_files_size, size, name)
                         }
                         Ok(AddTorrentResponse::ListOnly(r)) => {
                             if let Some(ref t) = torrent {
@@ -209,7 +210,7 @@ async fn main() -> Result<()> {
                             // use `r.info` for Memory, SQLite,
                             // Manticore and other alternative storage type
 
-                            index.insert(i, 0, r.info.name.map(|n| n.to_string()), r.info.length)
+                            index.insert(i, 0, size(&r.info), r.info.name.map(|n| n.to_string()))
                         }
                         // unexpected as should be deleted
                         Ok(AddTorrentResponse::AlreadyManaged(..)) => panic!(),
@@ -238,7 +239,7 @@ async fn main() -> Result<()> {
                 rss.push(
                     k,
                     v.name().unwrap_or(k),
-                    v.length().map(|l| l.bytes()),
+                    v.size().map(|l| l.bytes()),
                     Some(&v.time.to_rfc2822()),
                 )?
             }
@@ -284,4 +285,18 @@ fn magnet(infohash: &str, trackers: Option<&HashSet<Url>>) -> String {
         }
     }
     m
+}
+
+/// Count total size, including torrent files
+fn size(info: &librqbit::TorrentMetaV1Info<librqbit::ByteBufOwned>) -> u64 {
+    let mut t = 0;
+    if let Some(l) = info.length {
+        t += l
+    }
+    if let Some(ref files) = info.files {
+        for f in files {
+            t += f.length
+        }
+    }
+    t
 }
