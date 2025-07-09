@@ -34,9 +34,13 @@ impl Rss {
             b"<?xml version=\"1.0\" encoding=\"UTF-8\"?><rss version=\"2.0\"><channel>",
         )?;
 
+        let t = chrono::Utc::now().to_rfc2822();
         file.write_all(b"<pubDate>")?;
-        file.write_all(chrono::Utc::now().to_rfc2822().as_bytes())?;
+        file.write_all(t.as_bytes())?;
         file.write_all(b"</pubDate>")?;
+        file.write_all(b"<lastBuildDate>")?;
+        file.write_all(t.as_bytes())?;
+        file.write_all(b"</lastBuildDate>")?;
 
         file.write_all(b"<title>")?;
         file.write_all(escape(title).as_bytes())?;
