@@ -387,6 +387,7 @@ fn list(info: &TorrentMetaV1Info<ByteBufOwned>, limit: usize) -> Option<Vec<(Str
             b.push(("...".to_string(), l));
             break;
         }
+        b.sort_by(|a, b| a.0.cmp(&b.0)); // @TODO optional
         b
     })
 }
