@@ -24,10 +24,12 @@ use url::Url;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    use chrono::Local;
     use clap::Parser;
     use tokio::time;
 
     // init components
+    let time_init = Local::now();
     let config = Config::parse();
     if config.debug {
         tracing_subscriber::fmt::init()
@@ -73,7 +75,7 @@ async fn main() -> Result<()> {
     .await?;
 
     // begin
-    println!("Crawler started");
+    println!("Crawler started on {time_init}");
     let mut index = Index::init(
         config.index_capacity,
         config.index_timeout,
@@ -82,8 +84,9 @@ async fn main() -> Result<()> {
         config.export_rss.is_some() && config.index_list,
     );
     loop {
+        let time_queue = Local::now();
         if config.debug {
-            println!("\tQueue crawl begin...")
+            println!("\tQueue crawl begin on {time_queue}...")
         }
         index.refresh();
         for source in &config.infohash {
@@ -287,8 +290,14 @@ async fn main() -> Result<()> {
         }
         if config.debug {
             println!(
-                "Queue completed, {} total, await {} seconds to continue...",
+                "Queue completed on {time_queue}\n\ttotal: {}\n\ttime: {}s\n\tuptime: {}s\n\tawait {} seconds to continue...",
                 index.len(),
+                Local::now()
+                    .signed_duration_since(time_queue)
+                    .as_seconds_f32(),
+                Local::now()
+                    .signed_duration_since(time_init)
+                    .as_seconds_f32(),
                 config.sleep,
             )
         }
@@ -307,7 +316,7 @@ fn save_torrent_file(t: &Torrent, i: &str, b: &[u8], d: bool) {
                 }
             }
         }
-        Err(e) => eprintln!("Error on save torrent file `{i}`: {e}"),
+        Err(e) => eprintln!("Error on save torrent file `{i}`: `{e}`"),
     }
 }
 
