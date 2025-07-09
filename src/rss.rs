@@ -92,6 +92,23 @@ impl Rss {
     }
 }
 
+pub fn item_description(size: Option<u64>, list: Option<&Vec<(String, u64)>>) -> Option<String> {
+    if size.is_none() && list.is_none() {
+        return None;
+    }
+    let mut b = Vec::with_capacity(list.map(|l| l.len()).unwrap_or_default() + 1);
+    if let Some(s) = size {
+        use crate::format::Format;
+        b.push(s.bytes())
+    }
+    if let Some(l) = list {
+        for (path, size) in l {
+            b.push(format!("* {path}: {size}"))
+        }
+    }
+    Some(b.join("<br>\n"))
+}
+
 fn escape(subject: &str) -> String {
     subject
         .replace('&', "&amp;")

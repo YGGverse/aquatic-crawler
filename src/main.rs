@@ -12,7 +12,6 @@ mod trackers;
 use anyhow::Result;
 use config::Config;
 use debug::Debug;
-use format::Format;
 use index::Index;
 use librqbit::{
     AddTorrent, AddTorrentOptions, AddTorrentResponse, ByteBufOwned, ConnectionOptions,
@@ -250,7 +249,7 @@ async fn main() -> Result<()> {
                 rss.push(
                     k,
                     v.name().unwrap_or(k),
-                    v.size().map(|l| l.bytes()),
+                    rss::item_description(v.size(), v.list()),
                     Some(&v.time.to_rfc2822()),
                 )?
             }
@@ -317,23 +316,23 @@ fn list(info: &TorrentMetaV1Info<ByteBufOwned>, limit: usize) -> Option<Vec<(Str
         let mut b = Vec::with_capacity(files.len());
         let mut i = files.iter();
         let mut t = 0;
-        while let Some(f) = i.next() {
+        for f in i.by_ref() {
             t += 1;
             if t < limit {
                 b.push((
                     String::from_utf8(f.path.iter().flat_map(|b| b.to_vec()).collect())
                         .unwrap_or_default(),
                     f.length,
-                ))
-            } else {
-                // limit reached: count sizes left and use placeholder as the last item name
-                let mut l = 0;
-                while let Some(f) = i.next() {
-                    l += f.length
-                }
-                b.push(("...".to_string(), l));
-                break;
+                ));
+                continue;
             }
+            // limit reached: count sizes left and use placeholder as the last item name
+            let mut l = 0;
+            for f in i.by_ref() {
+                l += f.length
+            }
+            b.push(("...".to_string(), l));
+            break;
         }
         b
     })
