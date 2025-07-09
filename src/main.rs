@@ -356,8 +356,8 @@ fn list(info: &TorrentMetaV1Info<ByteBufOwned>, limit: usize) -> Option<Vec<(Str
         let mut i = files.iter();
         let mut t = 0;
         for f in i.by_ref() {
-            t += 1;
             if t < limit {
+                t += 1;
                 b.push((
                     String::from_utf8(
                         f.path
