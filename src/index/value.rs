@@ -49,7 +49,7 @@ fn filter_list(value: Option<Vec<(String, u64)>>) -> Option<Vec<(String, u64)>> 
     value.map(|f| f.into_iter().map(|(n, l)| (filter(n), l)).collect())
 }
 
-/// Crop long values (prevents unexpected memory pool usage)
+/// Strip tags and bom chars, crop long strings (prevents memory pool overload)
 fn filter(value: String) -> String {
     const C: usize = 125; // + 3 for `...` offset, 128 chars max @TODO optional
     let s = value._strip_bom()._strip_tags();
