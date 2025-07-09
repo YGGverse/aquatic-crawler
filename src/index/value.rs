@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use voca_rs::Voca;
 
 /// The `Index` value
 pub struct Value {
@@ -41,32 +42,19 @@ impl Value {
 }
 
 fn filter_name(value: Option<String>) -> Option<String> {
-    value.map(crop)
+    value.map(filter)
 }
 
 fn filter_list(value: Option<Vec<(String, u64)>>) -> Option<Vec<(String, u64)>> {
-    value.map(|f| {
-        f.into_iter()
-            .map(|(n, l)| (crop(sanitize(&n)), l))
-            .collect()
-    })
+    value.map(|f| f.into_iter().map(|(n, l)| (filter(n), l)).collect())
 }
 
 /// Crop long values (prevents unexpected memory pool usage)
-fn crop(value: String) -> String {
+fn filter(value: String) -> String {
     const C: usize = 125; // + 3 for `...` offset, 128 chars max @TODO optional
-    if value.chars().count() > C {
-        format!(
-            "{}...",
-            sanitize(&value.chars().take(C).collect::<String>())
-        )
-    } else {
-        value
+    let s = value._strip_bom()._strip_tags();
+    if s.chars().count() > C {
+        return format!("{}...", s.chars().take(C).collect::<String>());
     }
-}
-
-/// Strip tags & bom chars from string
-fn sanitize(value: &str) -> String {
-    use voca_rs::strip::*;
-    strip_tags(&strip_bom(value))
+    s
 }
