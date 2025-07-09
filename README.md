@@ -152,6 +152,12 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
       --index-list
           Index torrent files
 
+      --index-list-limit <INDEX_LIST_LIMIT>
+          Limit torrent files quantity to index
+          * insert the `...` placeholder as the last item, with total size left
+
+          [default: 100]
+
       --index-timeout <INDEX_TIMEOUT>
           Remove records from index older than `seconds`
 

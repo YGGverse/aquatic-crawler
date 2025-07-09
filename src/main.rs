@@ -188,7 +188,7 @@ async fn main() -> Result<()> {
                                 (
                                     m.info.name.as_ref().map(|n| n.to_string()),
                                     size(&m.info),
-                                    list(&m.info),
+                                    list(&m.info, config.index_list_limit),
                                 )
                             })?;
                             session.update_only_files(&mt, &only_files).await?;
@@ -219,7 +219,7 @@ async fn main() -> Result<()> {
                                 i,
                                 0,
                                 size(&r.info),
-                                list(&r.info),
+                                list(&r.info, config.index_list_limit),
                                 r.info.name.map(|n| n.to_string()),
                             )
                         }
@@ -312,17 +312,29 @@ fn size(info: &TorrentMetaV1Info<ByteBufOwned>) -> u64 {
     t
 }
 
-fn list(info: &TorrentMetaV1Info<ByteBufOwned>) -> Option<Vec<(String, u64)>> {
+fn list(info: &TorrentMetaV1Info<ByteBufOwned>, limit: usize) -> Option<Vec<(String, u64)>> {
     info.files.as_ref().map(|files| {
-        files
-            .iter()
-            .map(|f| {
-                (
+        let mut b = Vec::with_capacity(files.len());
+        let mut i = files.iter();
+        let mut t = 0;
+        while let Some(f) = i.next() {
+            t += 1;
+            if t < limit {
+                b.push((
                     String::from_utf8(f.path.iter().flat_map(|b| b.to_vec()).collect())
                         .unwrap_or_default(),
                     f.length,
-                )
-            })
-            .collect()
+                ))
+            } else {
+                // limit reached: count sizes left and use placeholder as the last item name
+                let mut l = 0;
+                while let Some(f) = i.next() {
+                    l += f.length
+                }
+                b.push(("...".to_string(), l));
+                break;
+            }
+        }
+        b
     })
 }

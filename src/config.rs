@@ -121,6 +121,11 @@ pub struct Config {
     #[arg(long, default_value_t = false)]
     pub index_list: bool,
 
+    /// Limit torrent files quantity to index
+    /// * insert the `...` placeholder as the last item, with total size left
+    #[arg(long, default_value_t = 100)]
+    pub index_list_limit: usize,
+
     /// Remove records from index older than `seconds`
     #[arg(long)]
     pub index_timeout: Option<i64>,
