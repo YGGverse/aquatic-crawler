@@ -290,7 +290,7 @@ async fn main() -> Result<()> {
         }
         if config.debug {
             println!(
-                "Queue completed on {time_queue}\n\ttotal: {}\n\ttime: {}s\n\tuptime: {}s\n\tawait {} seconds to continue...",
+                "Queue completed on {time_queue}\n\ttotal: {}\n\ttime: {} s\n\tuptime: {} s\n\tawait {} seconds to continue...",
                 index.len(),
                 Local::now()
                     .signed_duration_since(time_queue)
