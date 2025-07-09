@@ -320,7 +320,7 @@ fn list(info: &TorrentMetaV1Info<ByteBufOwned>, limit: usize) -> Option<Vec<(Str
             t += 1;
             if t < limit {
                 b.push((
-                    String::from_utf8(f.path.iter().flat_map(|b| b.to_vec()).collect())
+                    String::from_utf8(f.path.iter().flat_map(|b| b.0.to_vec()).collect())
                         .unwrap_or_default(),
                     f.length,
                 ));
