@@ -31,7 +31,7 @@ async fn main() -> Result<()> {
     // init components
     let time_init = Local::now();
     let config = Config::parse();
-    if config.debug {
+    if std::env::var("RUST_LOG").is_ok() {
         tracing_subscriber::fmt::init()
     }
     let peers = Peers::init(&config.initial_peer)?;
