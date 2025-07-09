@@ -29,21 +29,29 @@ impl Rss {
         }
         // init temporary file to write
         let mut file = File::create(&tmp)?;
+
         file.write_all(
-            b"<?xml version=\"1.0\" encoding=\"UTF-8\"?><rss version=\"2.0\"><channel><title>",
+            b"<?xml version=\"1.0\" encoding=\"UTF-8\"?><rss version=\"2.0\"><channel>",
         )?;
+
+        file.write_all(b"<pubDate>")?;
+        file.write_all(chrono::Utc::now().to_rfc2822().as_bytes())?;
+        file.write_all(b"</pubDate>")?;
+
+        file.write_all(b"<title>")?;
         file.write_all(escape(title).as_bytes())?;
         file.write_all(b"</title>")?;
+
+        if let Some(s) = description {
+            file.write_all(b"<description>")?;
+            file.write_all(escape(s).as_bytes())?;
+            file.write_all(b"</description>")?
+        }
 
         if let Some(s) = link {
             file.write_all(b"<link>")?;
             file.write_all(escape(s).as_bytes())?;
             file.write_all(b"</link>")?
-        }
-        if let Some(s) = description {
-            file.write_all(b"<description>")?;
-            file.write_all(escape(s).as_bytes())?;
-            file.write_all(b"</description>")?
         }
 
         Ok(Self {
