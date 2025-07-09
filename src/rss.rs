@@ -106,7 +106,7 @@ pub fn item_description(size: Option<u64>, list: Option<&Vec<(String, u64)>>) ->
             b.push(format!("* {path}: {size}"))
         }
     }
-    Some(b.join("<br>\n"))
+    Some(b.join("\n"))
 }
 
 fn escape(subject: &str) -> String {
