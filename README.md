@@ -56,13 +56,7 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
 
 ``` bash
   -d, --debug <DEBUG>
-          Debug level
-
-          * `e` - error
-          * `i` - info
-          * `t` - trace (run with `RUST_LOG=librqbit=trace`)
-
-          [default: ei]
+          Print debug output
 
       --infohash <INFOHASH>
           Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API

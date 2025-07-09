@@ -1,6 +1,5 @@
 mod api;
 mod config;
-mod debug;
 mod format;
 mod index;
 mod peers;
@@ -11,7 +10,6 @@ mod trackers;
 
 use anyhow::Result;
 use config::Config;
-use debug::Debug;
 use index::Index;
 use librqbit::{
     AddTorrent, AddTorrentOptions, AddTorrentResponse, ByteBufOwned, ConnectionOptions,
@@ -31,7 +29,9 @@ async fn main() -> Result<()> {
 
     // init components
     let config = Config::parse();
-    let debug = Debug::init(&config.debug)?;
+    if config.debug {
+        tracing_subscriber::fmt::init()
+    }
     let peers = Peers::init(&config.initial_peer)?;
     let preload = preload::init(
         config.preload,
@@ -73,7 +73,7 @@ async fn main() -> Result<()> {
     .await?;
 
     // begin
-    debug.info("Crawler started");
+    println!("Crawler started");
     let mut index = Index::init(
         config.index_capacity,
         config.index_timeout,
@@ -82,19 +82,25 @@ async fn main() -> Result<()> {
         config.export_rss.is_some() && config.index_list,
     );
     loop {
-        debug.info("Index queue begin...");
+        if config.debug {
+            println!("\tQueue crawl begin...")
+        }
         index.refresh();
         for source in &config.infohash {
-            debug.info(&format!("Index source `{source}`..."));
+            if config.debug {
+                println!("\tIndex source `{source}`...")
+            }
             // grab latest info-hashes from this source
             // * aquatic server may update the stats at this moment, handle result manually
             for i in match api::get(source, config.index_capacity) {
                 Some(i) => i,
                 None => {
                     // skip without panic
-                    debug.error(&format!(
-                        "The feed `{source}` has an incomplete format (or is still updating); skip."
-                    ));
+                    if config.debug {
+                        eprintln!(
+                            "The feed `{source}` has an incomplete format (or is still updating); skip."
+                        )
+                    }
                     continue;
                 }
             } {
@@ -104,7 +110,9 @@ async fn main() -> Result<()> {
                 if index.has(&i) {
                     continue;
                 }
-                debug.info(&format!("Index `{i}`..."));
+                if config.debug {
+                    println!("\t\tIndex `{i}`...")
+                }
                 // run the crawler in single thread for performance reasons,
                 // use `timeout` argument option to skip the dead connections.
                 match time::timeout(
@@ -158,17 +166,21 @@ async fn main() -> Result<()> {
                                             if p.max_filesize.is_some_and(|limit| {
                                                 only_files_size + info.len > limit
                                             }) {
-                                                debug.info(&format!(
-                                                    "Total files size limit `{i}` reached!"
-                                                ));
+                                                if config.debug {
+                                                    println!(
+                                                        "\t\t\ttotal files size limit `{i}` reached!"
+                                                    )
+                                                }
                                                 break;
                                             }
                                             if p.max_filecount
                                                 .is_some_and(|limit| only_files.len() + 1 > limit)
                                             {
-                                                debug.info(&format!(
-                                                    "Total files count limit for `{i}` reached!"
-                                                ));
+                                                if config.debug {
+                                                    println!(
+                                                        "\t\t\ttotal files count limit for `{i}` reached!"
+                                                    )
+                                                }
                                                 break;
                                             }
                                             only_files_size += info.len;
@@ -181,7 +193,7 @@ async fn main() -> Result<()> {
                                     }
                                 }
                                 if let Some(ref t) = torrent {
-                                    save_torrent_file(t, &debug, &i, &m.torrent_bytes)
+                                    save_torrent_file(t, &i, &m.torrent_bytes, config.debug)
                                 }
 
                                 (
@@ -203,16 +215,24 @@ async fn main() -> Result<()> {
                                 p.cleanup(&i, Some(only_files_keep))?
                             }
 
+                            if config.debug {
+                                println!("\t\t\tadd `{i}` to index.")
+                            }
+
                             index.insert(i, only_files_size, size, list, name)
                         }
                         Ok(AddTorrentResponse::ListOnly(r)) => {
                             if let Some(ref t) = torrent {
-                                save_torrent_file(t, &debug, &i, &r.torrent_bytes)
+                                save_torrent_file(t, &i, &r.torrent_bytes, config.debug)
                             }
 
                             // @TODO
                             // use `r.info` for Memory, SQLite,
                             // Manticore and other alternative storage type
+
+                            if config.debug {
+                                println!("\t\t\tadd `{i}` to index.")
+                            }
 
                             index.insert(
                                 i,
@@ -224,9 +244,13 @@ async fn main() -> Result<()> {
                         }
                         // unexpected as should be deleted
                         Ok(AddTorrentResponse::AlreadyManaged(..)) => panic!(),
-                        Err(e) => debug.info(&format!("Skip `{i}`: `{e}`.")),
+                        Err(e) => eprintln!("Failed to resolve `{i}`: `{e}`."),
                     },
-                    Err(e) => debug.info(&format!("Skip `{i}`: `{e}`.")),
+                    Err(e) => {
+                        if config.debug {
+                            println!("\t\t\tfailed to resolve `{i}`: `{e}`")
+                        }
+                    }
                 }
             }
         }
@@ -261,23 +285,29 @@ async fn main() -> Result<()> {
         {
             panic!("Preload content size {} bytes reached!", 0)
         }
-        debug.info(&format!(
-            "Index completed, {} total, await {} seconds to continue...",
-            index.len(),
-            config.sleep,
-        ));
+        if config.debug {
+            println!(
+                "Queue completed, {} total, await {} seconds to continue...",
+                index.len(),
+                config.sleep,
+            )
+        }
         std::thread::sleep(Duration::from_secs(config.sleep));
     }
 }
 
 /// Shared handler function to save resolved torrents as file
-fn save_torrent_file(t: &Torrent, d: &Debug, i: &str, b: &[u8]) {
+fn save_torrent_file(t: &Torrent, i: &str, b: &[u8], d: bool) {
     match t.persist(i, b) {
-        Ok(r) => d.info(&match r {
-            Some(p) => format!("Add torrent file `{}`", p.to_string_lossy()),
-            None => format!("Torrent file `{i}` already exists"),
-        }),
-        Err(e) => d.error(&format!("Error on save torrent file `{i}`: {e}")),
+        Ok(r) => {
+            if d {
+                match r {
+                    Some(p) => println!("\t\t\tadd torrent file `{}`", p.to_string_lossy()),
+                    None => println!("\t\t\ttorrent file `{i}` already exists"),
+                }
+            }
+        }
+        Err(e) => eprintln!("Error on save torrent file `{i}`: {e}"),
     }
 }
 

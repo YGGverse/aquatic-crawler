@@ -3,13 +3,9 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Config {
-    /// Debug level
-    ///
-    /// * `e` - error
-    /// * `i` - info
-    /// * `t` - trace (run with `RUST_LOG=librqbit=trace`)
-    #[arg(short, long, default_value_t = String::from("ei"))]
-    pub debug: String,
+    /// Print debug output
+    #[arg(short, long, default_value_t = false)]
+    pub debug: bool,
 
     /// Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API
     ///
