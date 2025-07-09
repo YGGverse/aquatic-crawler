@@ -301,7 +301,7 @@ async fn main() -> Result<()> {
                 config.sleep,
             )
         }
-        std::thread::sleep(Duration::from_secs(config.sleep));
+        std::thread::sleep(Duration::from_secs(config.sleep))
     }
 }
 
