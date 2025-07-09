@@ -93,17 +93,17 @@ impl Rss {
 }
 
 pub fn item_description(size: Option<u64>, list: Option<&Vec<(String, u64)>>) -> Option<String> {
+    use crate::format::Format;
     if size.is_none() && list.is_none() {
         return None;
     }
     let mut b = Vec::with_capacity(list.map(|l| l.len()).unwrap_or_default() + 1);
     if let Some(s) = size {
-        use crate::format::Format;
         b.push(s.bytes())
     }
     if let Some(l) = list {
         for (path, size) in l {
-            b.push(format!("* {path}: {size}"))
+            b.push(format!("{path} ({})", size.bytes()))
         }
     }
     Some(b.join("\n"))
