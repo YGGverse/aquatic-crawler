@@ -54,9 +54,12 @@ fn filter_list(value: Option<Vec<(String, u64)>>) -> Option<Vec<(String, u64)>> 
 
 /// Crop long values (prevents unexpected memory pool usage)
 fn crop(value: String) -> String {
-    const L: usize = 125; // + 3 bytes for `...` offset, 128 max @TODO optional
-    if value.len() > L {
-        format!("{}...", sanitize(&value[..L]))
+    const C: usize = 125; // + 3 bytes for `...` offset, 128 max @TODO optional
+    if value.chars().count() > C {
+        format!(
+            "{}...",
+            sanitize(&value.chars().take(C).collect::<String>())
+        )
     } else {
         value
     }
