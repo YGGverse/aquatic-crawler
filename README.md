@@ -55,12 +55,11 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
 ### Options
 
 ``` bash
-  -d, --debug <DEBUG>
+  -d, --debug
           Print debug output
 
       --infohash <INFOHASH>
           Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API
-
           * PR#233 feature ([Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic))
 
       --tracker <TRACKER>
@@ -95,8 +94,11 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
       --enable-tcp
           Enable TCP connection
 
-      --enable-upnp-port-forwarding
-          Enable UPnP
+      --listen <LISTEN>
+          Bind listener on specified `host:port` (`[host]:port` for IPv6)
+
+      --listen-upnp
+          Enable UPnP forwarding
 
       --enable-upload
           Enable upload (share bytes received with BitTorrent network)

@@ -13,11 +13,11 @@ use config::Config;
 use index::Index;
 use librqbit::{
     AddTorrent, AddTorrentOptions, AddTorrentResponse, ByteBufOwned, ConnectionOptions,
-    PeerConnectionOptions, SessionOptions, TorrentMetaV1Info,
+    ListenerOptions, PeerConnectionOptions, SessionOptions, TorrentMetaV1Info,
 };
 use peers::Peers;
 use rss::Rss;
-use std::{collections::HashSet, num::NonZero, path::PathBuf, time::Duration};
+use std::{collections::HashSet, num::NonZero, path::PathBuf, str::FromStr, time::Duration};
 use torrent::Torrent;
 use trackers::Trackers;
 use url::Url;
@@ -51,6 +51,17 @@ async fn main() -> Result<()> {
             None => PathBuf::new(),
         },
         SessionOptions {
+            listen: Some(match config.listen {
+                Some(l) => ListenerOptions {
+                    listen_addr: std::net::SocketAddr::from_str(&l).unwrap(),
+                    enable_upnp_port_forwarding: config.listen_upnp,
+                    ..ListenerOptions::default()
+                },
+                None => ListenerOptions {
+                    enable_upnp_port_forwarding: config.listen_upnp,
+                    ..ListenerOptions::default()
+                },
+            }),
             connect: Some(ConnectionOptions {
                 enable_tcp: config.enable_tcp,
                 proxy_url: config.proxy_url,

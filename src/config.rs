@@ -53,9 +53,13 @@ pub struct Config {
     #[arg(long, default_value_t = false)]
     pub enable_tcp: bool,
 
-    /// Enable UPnP
+    /// Bind listener on specified `host:port` (`[host]:port` for IPv6)
+    #[arg(long)]
+    pub listen: Option<String>,
+
+    /// Enable UPnP forwarding
     #[arg(long, default_value_t = false)]
-    pub enable_upnp_port_forwarding: bool,
+    pub listen_upnp: bool,
 
     /// Enable upload (share bytes received with BitTorrent network)
     #[arg(long, default_value_t = false)]
