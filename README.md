@@ -4,10 +4,14 @@
 [![Dependencies](https://deps.rs/repo/github/YGGverse/aquatic-crawler/status.svg)](https://deps.rs/repo/github/YGGverse/aquatic-crawler)
 [![crates.io](https://img.shields.io/crates/v/aquatic-crawler.svg)](https://crates.io/crates/aquatic-crawler)
 
-Crawler for [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker based on [librqbit](https://github.com/ikatson/rqbit/tree/main/crates/librqbit) API
+SSD-friendly crawler for the [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker based on [librqbit](https://github.com/ikatson/rqbit/tree/main/crates/librqbit) API
 
 > [!NOTE]
 > Compatible with any other `--infohash` source in `hash1hash2...` binary format (see also the [Online API](https://github.com/YGGverse/aquatic-crawler/wiki/Online-API))
+
+## Conception
+
+See the project [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki)
 
 ## Features
 
