@@ -53,7 +53,7 @@ async fn main() -> Result<()> {
         SessionOptions {
             listen: Some(match config.listen {
                 Some(l) => ListenerOptions {
-                    listen_addr: std::net::SocketAddr::from_str(&l).unwrap(),
+                    listen_addr: std::net::SocketAddr::from_str(&l)?,
                     enable_upnp_port_forwarding: config.listen_upnp,
                     ..ListenerOptions::default()
                 },
