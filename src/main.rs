@@ -235,7 +235,13 @@ async fn main() -> Result<()> {
                                 println!("\t\t\tadd `{i}` to index.")
                             }
 
-                            index.insert(i, only_files_size, size, list, name)
+                            index.insert(
+                                i,
+                                only_files_size,
+                                size,
+                                list,
+                                name.map(|n| n.to_string()).filter(|s| !s.is_empty()), // librqbit#452
+                            )
                         }
                         Ok(AddTorrentResponse::ListOnly(r)) => {
                             if let Some(ref t) = torrent {
@@ -255,7 +261,7 @@ async fn main() -> Result<()> {
                                 0,
                                 size(&r.info),
                                 list(&r.info, config.index_list_limit),
-                                r.info.name.map(|n| n.to_string()),
+                                r.info.name.map(|n| n.to_string()).filter(|s| !s.is_empty()), // librqbit#452
                             )
                         }
                         // unexpected as should be deleted
