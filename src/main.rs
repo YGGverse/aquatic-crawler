@@ -51,6 +51,7 @@ async fn main() -> Result<()> {
             None => PathBuf::new(),
         },
         SessionOptions {
+            bind_device_name: config.bind,
             listen: match config.listen {
                 Some(l) => Some(ListenerOptions {
                     listen_addr: std::net::SocketAddr::from_str(&l)?,

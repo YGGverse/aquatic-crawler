@@ -53,7 +53,14 @@ pub struct Config {
     #[arg(long, default_value_t = false)]
     pub enable_tcp: bool,
 
+    /// Bind resolver session on specified device name (`tun0`, `mycelium`, etc.)
+    #[arg(long)]
+    pub bind: Option<String>,
+
     /// Bind listener on specified `host:port` (`[host]:port` for IPv6)
+    ///
+    /// * this option is useful only for binding the data exchange service,
+    ///   to restrict the outgoing connections for torrent resolver, use `bind` option instead
     #[arg(long)]
     pub listen: Option<String>,
 

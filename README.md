@@ -94,8 +94,14 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
       --enable-tcp
           Enable TCP connection
 
+      --bind <BIND>
+          Bind resolver session on specified device name (`tun0`, `mycelium`, etc.)
+
       --listen <LISTEN>
           Bind listener on specified `host:port` (`[host]:port` for IPv6)
+
+          * this option is useful only for binding the data exchange service,
+            to restrict the outgoing connections for torrent resolver, use `bind` option instead
 
       --listen-upnp
           Enable UPnP forwarding
