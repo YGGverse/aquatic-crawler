@@ -13,7 +13,7 @@ use config::Config;
 use index::Index;
 use librqbit::{
     AddTorrent, AddTorrentOptions, AddTorrentResponse, ByteBufOwned, ConnectionOptions,
-    ListenerOptions, PeerConnectionOptions, SessionOptions, TorrentMetaV1Info,
+    ListenerOptions, PeerConnectionOptions, SessionOptions, ValidatedTorrentMetaV1Info,
 };
 use peers::Peers;
 use rss::Rss;
@@ -214,7 +214,7 @@ async fn main() -> Result<()> {
                                 }
 
                                 (
-                                    m.info.name.as_ref().map(|n| n.to_string()),
+                                    m.info.name().as_ref().map(|n| n.to_string()),
                                     size(&m.info),
                                     list(&m.info, config.index_list_limit),
                                 )
@@ -241,7 +241,7 @@ async fn main() -> Result<()> {
                                 only_files_size,
                                 size,
                                 list,
-                                name.map(|n| n.to_string()).filter(|s| !s.is_empty()), // librqbit#452
+                                name.map(|n| n.to_string()),
                             )
                         }
                         Ok(AddTorrentResponse::ListOnly(r)) => {
@@ -262,7 +262,7 @@ async fn main() -> Result<()> {
                                 0,
                                 size(&r.info),
                                 list(&r.info, config.index_list_limit),
-                                r.info.name.map(|n| n.to_string()).filter(|s| !s.is_empty()), // librqbit#452
+                                r.info.name().map(|n| n.to_string()),
                             )
                         }
                         // unexpected as should be deleted
@@ -357,12 +357,12 @@ fn magnet(infohash: &str, trackers: Option<&HashSet<Url>>) -> String {
 }
 
 /// Count total size, including torrent files
-fn size(info: &TorrentMetaV1Info<ByteBufOwned>) -> u64 {
+fn size(meta: &ValidatedTorrentMetaV1Info<ByteBufOwned>) -> u64 {
     let mut t = 0;
-    if let Some(l) = info.length {
+    if let Some(l) = meta.info().length {
         t += l
     }
-    if let Some(ref files) = info.files {
+    if let Some(ref files) = meta.info().files {
         for f in files {
             t += f.length
         }
@@ -371,10 +371,10 @@ fn size(info: &TorrentMetaV1Info<ByteBufOwned>) -> u64 {
 }
 
 fn list(
-    info: &TorrentMetaV1Info<ByteBufOwned>,
+    meta: &ValidatedTorrentMetaV1Info<ByteBufOwned>,
     limit: usize,
 ) -> Option<Vec<(Option<String>, u64)>> {
-    info.files.as_ref().map(|files| {
+    meta.info().files.as_ref().map(|files| {
         let mut b = Vec::with_capacity(files.len());
         let mut i = files.iter();
         let mut t = 0;
