@@ -104,7 +104,10 @@ impl Rss {
     }
 }
 
-pub fn item_description(size: Option<u64>, list: Option<&Vec<(String, u64)>>) -> Option<String> {
+pub fn item_description(
+    size: Option<u64>,
+    list: Option<&Vec<(Option<String>, u64)>>,
+) -> Option<String> {
     use crate::format::Format;
     if size.is_none() && list.is_none() {
         return None;
@@ -115,7 +118,11 @@ pub fn item_description(size: Option<u64>, list: Option<&Vec<(String, u64)>>) ->
     }
     if let Some(l) = list {
         for (path, size) in l {
-            b.push(format!("{path} ({})", size.bytes()))
+            b.push(format!(
+                "{} ({})",
+                path.as_deref().unwrap_or("?"), // @TODO invalid encoding
+                size.bytes()
+            ))
         }
     }
     Some(b.join("\n"))

@@ -363,7 +363,10 @@ fn size(info: &TorrentMetaV1Info<ByteBufOwned>) -> u64 {
     t
 }
 
-fn list(info: &TorrentMetaV1Info<ByteBufOwned>, limit: usize) -> Option<Vec<(String, u64)>> {
+fn list(
+    info: &TorrentMetaV1Info<ByteBufOwned>,
+    limit: usize,
+) -> Option<Vec<(Option<String>, u64)>> {
     info.files.as_ref().map(|files| {
         let mut b = Vec::with_capacity(files.len());
         let mut i = files.iter();
@@ -387,7 +390,7 @@ fn list(info: &TorrentMetaV1Info<ByteBufOwned>, limit: usize) -> Option<Vec<(Str
                             })
                             .collect(),
                     )
-                    .unwrap_or_default(),
+                    .ok(),
                     f.length,
                 ));
                 continue;
@@ -397,7 +400,7 @@ fn list(info: &TorrentMetaV1Info<ByteBufOwned>, limit: usize) -> Option<Vec<(Str
             for f in i.by_ref() {
                 l += f.length
             }
-            b.push(("...".to_string(), l));
+            b.push((Some("...".to_string()), l));
             break;
         }
         b[..t].sort_by(|a, b| a.0.cmp(&b.0)); // @TODO optional

@@ -62,7 +62,7 @@ impl Index {
         infohash: String,
         node: u64,
         size: u64,
-        list: Option<Vec<(String, u64)>>,
+        list: Option<Vec<(Option<String>, u64)>>,
         name: Option<String>,
     ) {
         if self
