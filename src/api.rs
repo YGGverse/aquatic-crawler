@@ -7,8 +7,11 @@ use info_hash::InfoHash;
 /// * return `None` if the `path` is not reachable
 pub fn get(path: &str, capacity: usize) -> Option<Vec<InfoHash>> {
     use std::io::Read;
+    if !path.ends_with(".bin") {
+        todo!("Only sources in the `.bin` format are supported!")
+    }
     if path.contains("://") {
-        todo!("URL sources yet not supported")
+        todo!("URL source format is not supported!")
     }
     const L: usize = 20; // v1 only
     let mut r = Vec::with_capacity(capacity);
