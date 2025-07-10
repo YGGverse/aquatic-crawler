@@ -51,17 +51,19 @@ async fn main() -> Result<()> {
             None => PathBuf::new(),
         },
         SessionOptions {
-            listen: Some(match config.listen {
-                Some(l) => ListenerOptions {
+            listen: match config.listen {
+                Some(l) => Some(ListenerOptions {
                     listen_addr: std::net::SocketAddr::from_str(&l)?,
                     enable_upnp_port_forwarding: config.listen_upnp,
                     ..ListenerOptions::default()
-                },
-                None => ListenerOptions {
-                    enable_upnp_port_forwarding: config.listen_upnp,
-                    ..ListenerOptions::default()
-                },
-            }),
+                }),
+                None => {
+                    if config.listen_upnp {
+                        panic!("`--listen` argument is required!")
+                    }
+                    None
+                }
+            },
             connect: Some(ConnectionOptions {
                 enable_tcp: config.enable_tcp,
                 proxy_url: config.proxy_url,
