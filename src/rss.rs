@@ -4,9 +4,13 @@ use url::Url;
 
 /// Export crawl index to the RSS file
 pub struct Rss {
+    /// Resulting (public) file in the XML format
     file: File,
+    /// Shared directory for the feed `file` and its `tmp` buffer file
     target: PathBuf,
+    /// Creates temporary file to exclude feed format damage on update
     tmp: PathBuf,
+    /// Trackers source for every item in channel
     trackers: Option<HashSet<Url>>,
 }
 
