@@ -32,6 +32,7 @@ See the project [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki)
     * [x] Resolved `.torrent` files (`--export-torrents`)
     * [x] RSS feed (`--export-rss`) includes resolved torrent meta and magnet links to download
         * customize feed options with `--export-rss-*` options group
+    * [ ] [Gemtext](https://geminiprotocol.net/docs/gemtext.gmi) static files catalog
     * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search index
     * [ ] SQLite database index
 
