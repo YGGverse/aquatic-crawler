@@ -24,5 +24,5 @@ urlencoding = "2.1"
 voca_rs = "1.15"
 walkdir = "2.5"
 [patch.crates-io]
-librqbit = { git = "https://github.com/ikatson/rqbit.git", rev="02dfb80b939a52abd0854339e2a8223a71563a68", package = "librqbit" }
+librqbit = { git = "https://github.com/ikatson/rqbit.git", rev="b580a9610ae7c6eaacd305a3905f7e2d3202ca69", package = "librqbit" }
 #librqbit = { version = "9.0.0-beta.1", path = "../../rqbit/crates/librqbit", package = "librqbit" }
