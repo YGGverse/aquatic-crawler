@@ -7,8 +7,8 @@
 SSD-friendly crawler for the [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker, based on the [librqbit](https://github.com/ikatson/rqbit/tree/main/crates/librqbit) API
 
 > [!NOTE]
-> * requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233), see the [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic) for more details
-> * compatible with any other `--infohash` source in `hash1hash2...` binary format (see also the [Online API](https://github.com/YGGverse/aquatic-crawler/wiki/Online-API))
+> * requires PR#233 or [info-hash-api](https://github.com/YGGverse/aquatic/tree/info-hash-api) branch implementation;
+> * compatible with any other `--infohash` source in `hash1hash2...` binary format (see the [Online API](https://github.com/YGGverse/aquatic-crawler/wiki/Online-API))
 
 ## Install
 
@@ -21,6 +21,9 @@ SSD-friendly crawler for the [Aquatic](https://github.com/greatest-ape/aquatic) 
 
 ## Usage
 
+> [!TIP]
+> Prepend `RUST_LOG=debug` to debug
+
 ``` bash
 aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
                 --infohash /path/to/info-hash-ipv6.bin\
@@ -29,7 +32,6 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
                 --tracker  udp://host2:port\
                 --preload  /path/to/directory
 ```
-* append `RUST_LOG=debug` to debug
 
 ### Options
 
