@@ -4,37 +4,11 @@
 [![Dependencies](https://deps.rs/repo/github/YGGverse/aquatic-crawler/status.svg)](https://deps.rs/repo/github/YGGverse/aquatic-crawler)
 [![crates.io](https://img.shields.io/crates/v/aquatic-crawler.svg)](https://crates.io/crates/aquatic-crawler)
 
-SSD-friendly crawler for the [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker based on [librqbit](https://github.com/ikatson/rqbit/tree/main/crates/librqbit) API
+SSD-friendly crawler for the [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker, based on the [librqbit](https://github.com/ikatson/rqbit/tree/main/crates/librqbit) API
 
 > [!NOTE]
-> Compatible with any other `--infohash` source in `hash1hash2...` binary format (see also the [Online API](https://github.com/YGGverse/aquatic-crawler/wiki/Online-API))
-
-## Conception
-
-See the project [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki)
-
-## Features
-
-> [!TIP]
-> For details on all implemented features, see the [Options](#options) section
-
-* Info-hash versions
-    * [x] 1
-    * [ ] 2
-* Import sources
-    * [x] IPv4 / IPv6 info-hash binary API (requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233), [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic))
-        * [x] local file path
-        * [ ] remote URL
-* Export options
-    * [x] Content (`--preload`)
-        * [x] data match the regex pattern (`--preload-regex`)
-        * [x] data match limits (see `--preload-*` options group)
-    * [x] Resolved `.torrent` files (`--export-torrents`)
-    * [x] RSS feed (`--export-rss`) includes resolved torrent meta and magnet links to download
-        * customize feed options with `--export-rss-*` options group
-    * [ ] [Gemtext](https://geminiprotocol.net/docs/gemtext.gmi) static files catalog
-    * [ ] [Manticore](https://github.com/manticoresoftware/manticoresearch-rust) full text search index
-    * [ ] SQLite database index
+> * requires [PR#233](https://github.com/greatest-ape/aquatic/pull/233), see the [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic) for more details
+> * compatible with any other `--infohash` source in `hash1hash2...` binary format (see also the [Online API](https://github.com/YGGverse/aquatic-crawler/wiki/Online-API))
 
 ## Install
 
@@ -53,140 +27,12 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
                 --infohash /path/to/another-source.bin\
                 --tracker  udp://host1:port\
                 --tracker  udp://host2:port\
-                --preload  /path/to/directory\
-                --enable-tcp
+                --preload  /path/to/directory
 ```
+* append `RUST_LOG=debug` to debug
 
 ### Options
 
 ``` bash
-  -d, --debug
-          Print debug output
-
-      --infohash <INFOHASH>
-          Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API
-          * PR#233 feature ([Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic))
-
-      --tracker <TRACKER>
-          Define custom tracker(s) to preload the `.torrent` files info
-
-      --initial-peer <INITIAL_PEER>
-          Define initial peer(s) to preload the `.torrent` files info
-
-      --export-torrents <EXPORT_TORRENTS>
-          Save resolved torrent files to given directory
-
-      --export-rss <EXPORT_RSS>
-          File path to export RSS feed
-
-      --export-rss-title <EXPORT_RSS_TITLE>
-          Custom title for RSS feed (channel)
-
-          [default: aquatic-crawler]
-
-      --export-rss-link <EXPORT_RSS_LINK>
-          Custom link for RSS feed (channel)
-
-      --export-rss-description <EXPORT_RSS_DESCRIPTION>
-          Custom description for RSS feed (channel)
-
-      --export-trackers
-          Appends `--tracker` value to magnets and torrents
-
-      --enable-dht
-          Enable DHT resolver
-
-      --enable-tcp
-          Enable TCP connection
-
-      --bind <BIND>
-          Bind resolver session on specified device name (`tun0`, `mycelium`, etc.)
-
-      --listen <LISTEN>
-          Bind listener on specified `host:port` (`[host]:port` for IPv6)
-
-          * this option is useful only for binding the data exchange service,
-            to restrict the outgoing connections for torrent resolver, use `bind` option instead
-
-      --listen-upnp
-          Enable UPnP forwarding
-
-      --enable-upload
-          Enable upload (share bytes received with BitTorrent network)
-
-      --preload <PRELOAD>
-          Directory path to store preloaded data (e.g. `.torrent` files)
-
-      --preload-clear
-          Clear previous data collected on crawl session start
-
-      --preload-regex <PRELOAD_REGEX>
-          Preload only files match regex pattern (list only without preload by default)
-          * see also `preload_max_filesize`, `preload_max_filecount` options
-
-          ## Example:
-
-          Filter by image ext ``` --preload-regex '(png|gif|jpeg|jpg|webp)$' ```
-
-          * requires `storage` argument defined
-
-      --preload-total-size <PRELOAD_TOTAL_SIZE>
-          Stop crawler on total preload files size reached
-
-      --preload-max-filesize <PRELOAD_MAX_FILESIZE>
-          Max size sum of preloaded files per torrent (match `preload_regex`)
-
-      --preload-max-filecount <PRELOAD_MAX_FILECOUNT>
-          Max count of preloaded files per torrent (match `preload_regex`)
-
-      --proxy-url <PROXY_URL>
-          Use `socks5://[username:password@]host:port`
-
-      --peer-connect-timeout <PEER_CONNECT_TIMEOUT>
-
-
-      --peer-read-write-timeout <PEER_READ_WRITE_TIMEOUT>
-
-
-      --peer-keep-alive-interval <PEER_KEEP_ALIVE_INTERVAL>
-
-
-      --index-capacity <INDEX_CAPACITY>
-          Estimated info-hash index capacity
-
-          [default: 1000]
-
-      --index-list
-          Index torrent files
-
-      --index-list-limit <INDEX_LIST_LIMIT>
-          Limit torrent files quantity to index
-          * insert the `...` placeholder as the last item, with total size left
-
-          [default: 100]
-
-      --index-timeout <INDEX_TIMEOUT>
-          Remove records from index older than `seconds`
-
-      --add-torrent-timeout <ADD_TORRENT_TIMEOUT>
-          Max time to handle each torrent
-
-          [default: 10]
-
-      --sleep <SLEEP>
-          Crawl loop delay in seconds
-
-          [default: 300]
-
-      --upload-limit <UPLOAD_LIMIT>
-          Limit upload speed (b/s)
-
-      --download-limit <DOWNLOAD_LIMIT>
-          Limit download speed (b/s)
-
-  -h, --help
-          Print help (see a summary with '-h')
-
-  -V, --version
-          Print version
+aquatic-crawler --help
 ```

@@ -1,12 +1,11 @@
 use clap::Parser;
+use regex::Regex;
+use std::{net::SocketAddr, path::PathBuf};
+use url::Url;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Config {
-    /// Print debug output
-    #[arg(short, long, default_value_t = false)]
-    pub debug: bool,
-
     /// Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API
     ///
     /// * PR#233 feature ([Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic))
@@ -15,31 +14,11 @@ pub struct Config {
 
     /// Define custom tracker(s) to preload the `.torrent` files info
     #[arg(long)]
-    pub tracker: Vec<String>,
+    pub tracker: Vec<Url>,
 
     /// Define initial peer(s) to preload the `.torrent` files info
     #[arg(long)]
-    pub initial_peer: Vec<String>,
-
-    /// Save resolved torrent files to given directory
-    #[arg(long)]
-    pub export_torrents: Option<String>,
-
-    /// File path to export RSS feed
-    #[arg(long)]
-    pub export_rss: Option<String>,
-
-    /// Custom title for RSS feed (channel)
-    #[arg(long, default_value_t = String::from("aquatic-crawler"))]
-    pub export_rss_title: String,
-
-    /// Custom link for RSS feed (channel)
-    #[arg(long)]
-    pub export_rss_link: Option<String>,
-
-    /// Custom description for RSS feed (channel)
-    #[arg(long)]
-    pub export_rss_description: Option<String>,
+    pub initial_peer: Option<Vec<SocketAddr>>,
 
     /// Appends `--tracker` value to magnets and torrents
     #[arg(long, default_value_t = false)]
@@ -49,9 +28,9 @@ pub struct Config {
     #[arg(long, default_value_t = false)]
     pub enable_dht: bool,
 
-    /// Enable TCP connection
+    /// Disable TCP connection
     #[arg(long, default_value_t = false)]
-    pub enable_tcp: bool,
+    pub disable_tcp: bool,
 
     /// Bind resolver session on specified device name (`tun0`, `mycelium`, etc.)
     #[arg(long)]
@@ -74,11 +53,7 @@ pub struct Config {
 
     /// Directory path to store preloaded data (e.g. `.torrent` files)
     #[arg(long)]
-    pub preload: Option<String>,
-
-    /// Clear previous data collected on crawl session start
-    #[arg(long, default_value_t = false)]
-    pub preload_clear: bool,
+    pub preload: PathBuf,
 
     /// Preload only files match regex pattern (list only without preload by default)
     /// * see also `preload_max_filesize`, `preload_max_filecount` options
@@ -92,11 +67,7 @@ pub struct Config {
     ///
     /// * requires `storage` argument defined
     #[arg(long)]
-    pub preload_regex: Option<String>,
-
-    /// Stop crawler on total preload files size reached
-    #[arg(long)]
-    pub preload_total_size: Option<u64>,
+    pub preload_regex: Option<Regex>,
 
     /// Max size sum of preloaded files per torrent (match `preload_regex`)
     #[arg(long)]
@@ -108,7 +79,7 @@ pub struct Config {
 
     /// Use `socks5://[username:password@]host:port`
     #[arg(long)]
-    pub proxy_url: Option<String>,
+    pub proxy_url: Option<Url>,
 
     // Peer options
     #[arg(long)]

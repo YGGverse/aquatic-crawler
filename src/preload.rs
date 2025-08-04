@@ -1,123 +1,90 @@
 use anyhow::{Result, bail};
 use regex::Regex;
-use std::{fs, path::PathBuf, str::FromStr};
+use std::{collections::HashSet, fs, path::PathBuf};
 
 pub struct Preload {
-    path: PathBuf,
+    root: PathBuf,
     pub max_filecount: Option<usize>,
     pub max_filesize: Option<u64>,
-    pub total_size: Option<u64>,
     pub regex: Option<Regex>,
 }
 
 impl Preload {
-    fn init(
-        directory: &str,
-        regex: Option<String>,
+    // Constructors
+
+    pub fn init(
+        root: PathBuf,
+        regex: Option<Regex>,
         max_filecount: Option<usize>,
         max_filesize: Option<u64>,
-        total_size: Option<u64>,
-        is_clear: bool,
     ) -> Result<Self> {
-        let path = PathBuf::from_str(directory)?;
-        if let Ok(t) = fs::metadata(&path) {
-            if t.is_file() {
-                bail!("Storage destination is not directory!");
-            }
-            if t.is_dir() && is_clear {
-                for i in fs::read_dir(&path)? {
-                    let r = i?.path();
-                    if r.is_dir() {
-                        fs::remove_dir_all(&r)?;
-                    } else {
-                        fs::remove_file(&r)?;
-                    }
-                }
-            }
+        if !root.is_dir() {
+            bail!("Preload root is not directory")
         }
-        fs::create_dir_all(&path)?;
         Ok(Self {
             max_filecount,
             max_filesize,
-            path,
-            regex: regex.map(|r| Regex::new(&r).unwrap()),
-            total_size,
+            regex,
+            root: root.canonicalize()?,
         })
     }
 
-    pub fn output_folder(&self, infohash: &str, create: bool) -> Result<String> {
-        let mut p = PathBuf::new();
-        p.push(&self.path);
-        p.push(infohash);
-        if p.is_file() {
-            bail!("File destination is not directory!");
-        }
-        if create {
-            fs::create_dir_all(&p)?;
-        }
-        if !p.is_dir() {
-            bail!("Destination directory not exists!")
-        }
-        Ok(p.to_string_lossy().to_string())
-    }
-
-    pub fn absolute(&self, infohash: &str, file: &PathBuf) -> PathBuf {
-        let mut p = PathBuf::new();
-        p.push(&self.path);
-        p.push(infohash);
-        p.push(file);
-        p
-    }
+    // Actions
 
     /// Recursively remove all files under the `infohash` location (see rqbit#408)
-    pub fn cleanup(&self, infohash: &str, keep_filenames: Option<Vec<PathBuf>>) -> Result<()> {
-        for e in walkdir::WalkDir::new(self.output_folder(infohash, false)?) {
+    pub fn cleanup(&self, info_hash: &str, keep_filenames: Option<HashSet<PathBuf>>) -> Result<()> {
+        for e in walkdir::WalkDir::new(self.output_folder(info_hash)?) {
             let e = e?;
             let p = e.into_path();
             if p.is_file() && keep_filenames.as_ref().is_none_or(|k| !k.contains(&p)) {
                 fs::remove_file(p)?;
             }
-        }
+        } // remove empty directories @TODO
         Ok(())
     }
 
-    pub fn path(&self) -> PathBuf {
-        self.path.clone()
+    pub fn persist_torrent_bytes(&self, info_hash: &str, contents: &[u8]) -> Result<PathBuf> {
+        let p = self.torrent(info_hash)?;
+        fs::write(&p, contents)?;
+        Ok(p)
     }
 
-    pub fn matches(&self, pattern: &str) -> bool {
-        self.regex.as_ref().is_some_and(|r| r.is_match(pattern))
+    // Getters
+
+    /// * creates new directory if not exists
+    pub fn output_folder(&self, info_hash: &str) -> Result<PathBuf> {
+        if !is_info_hash(info_hash) {
+            bail!("Invalid info-hash `{info_hash}`")
+        }
+        let mut p = PathBuf::from(&self.root);
+        p.push(info_hash);
+        if p.is_file() {
+            bail!("Output directory for info-hash `{info_hash}` is file")
+        }
+        if !p.exists() {
+            fs::create_dir(&p)?
+        }
+        Ok(p)
+    }
+
+    pub fn root(&self) -> &PathBuf {
+        &self.root
+    }
+
+    pub fn contains_torrent(&self, info_hash: &str) -> Result<bool> {
+        Ok(fs::exists(self.torrent(info_hash)?)?)
+    }
+
+    fn torrent(&self, info_hash: &str) -> Result<PathBuf> {
+        if !is_info_hash(info_hash) {
+            bail!("Invalid info-hash `{info_hash}`")
+        }
+        let mut p = PathBuf::from(&self.root);
+        p.push(format!("{info_hash}.torrent"));
+        Ok(p)
     }
 }
 
-/// Init `Preload` with validate related argument options
-pub fn init(
-    path: Option<String>,
-    regex: Option<String>,
-    max_filecount: Option<usize>,
-    max_filesize: Option<u64>,
-    total_size: Option<u64>,
-    is_clear: bool,
-) -> Result<Option<Preload>> {
-    Ok(match path {
-        Some(ref p) => Some(Preload::init(
-            p,
-            regex,
-            max_filecount,
-            max_filesize,
-            total_size,
-            is_clear,
-        )?),
-        None => {
-            if regex.is_some()
-                || max_filecount.is_some()
-                || max_filesize.is_some()
-                || total_size.is_some()
-                || is_clear
-            {
-                bail!("`--preload` directory is required for this configuration!")
-            }
-            None
-        }
-    })
+fn is_info_hash(value: &str) -> bool {
+    value.len() == 40 && value.chars().all(|c| c.is_ascii_hexdigit())
 }
