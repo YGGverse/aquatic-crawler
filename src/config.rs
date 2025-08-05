@@ -41,7 +41,7 @@ pub struct Config {
     /// * this option is useful only for binding the data exchange service,
     ///   to restrict the outgoing connections for torrent resolver, use `bind` option instead
     #[arg(long)]
-    pub listen: Option<String>,
+    pub listen: Option<SocketAddr>,
 
     /// Enable UPnP forwarding
     #[arg(long, default_value_t = false)]

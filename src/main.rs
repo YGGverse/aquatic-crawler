@@ -9,7 +9,7 @@ use librqbit::{
     PeerConnectionOptions, SessionOptions,
 };
 use preload::Preload;
-use std::{collections::HashSet, num::NonZero, str::FromStr, time::Duration};
+use std::{collections::HashSet, num::NonZero, time::Duration};
 use url::Url;
 
 #[tokio::main]
@@ -35,9 +35,9 @@ async fn main() -> Result<()> {
         SessionOptions {
             bind_device_name: config.bind,
             listen: match config.listen {
-                Some(l) => Some(ListenerOptions {
-                    listen_addr: std::net::SocketAddr::from_str(&l)?,
+                Some(listen_addr) => Some(ListenerOptions {
                     enable_upnp_port_forwarding: config.listen_upnp,
+                    listen_addr,
                     ..ListenerOptions::default()
                 }),
                 None => {
