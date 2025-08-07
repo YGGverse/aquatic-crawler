@@ -105,7 +105,8 @@ impl Preload {
             bail!("Output directory `{}` is file", p.to_string_lossy())
         }
         if is_create && !p.exists() {
-            fs::create_dir(&p)?
+            fs::create_dir(&p)?;
+            log::debug!("create tmp directory `{}`", p.to_string_lossy())
         }
         Ok(p)
     }
