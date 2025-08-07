@@ -18,14 +18,15 @@ impl Preload {
         max_filecount: Option<usize>,
         max_filesize: Option<u64>,
     ) -> Result<Self> {
-        if !root.is_dir() {
+        // make sure given path is valid and exist
+        if !root.canonicalize()?.is_dir() {
             bail!("Preload root is not directory")
         }
         Ok(Self {
             max_filecount,
             max_filesize,
             regex,
-            root: root.canonicalize()?,
+            root,
         })
     }
 
@@ -94,11 +95,12 @@ impl Preload {
 
     // Getters
 
-    /// * creates new temporary directory if not exists
+    /// Get absolute path to the temporary directory
+    /// * optionally creates directory if not exists
     pub fn tmp(&self, info_hash: &str, is_create: bool) -> Result<PathBuf> {
         validate_info_hash(info_hash)?;
         let mut p = PathBuf::from(&self.root);
-        p.push(tmp(info_hash));
+        p.push(tmp_component(info_hash));
         if p.is_file() {
             bail!("Output directory `{}` is file", p.to_string_lossy())
         }
@@ -108,15 +110,18 @@ impl Preload {
         Ok(p)
     }
 
+    /// Get root location for `Self`
     pub fn root(&self) -> &PathBuf {
         &self.root
     }
 
+    /// Check the given hash is contain resolved torrent file
     pub fn contains_torrent(&self, info_hash: &str) -> Result<bool> {
         validate_info_hash(info_hash)?;
         Ok(fs::exists(self.torrent(info_hash))?)
     }
 
+    /// Get absolute path to the torrent file
     fn torrent(&self, info_hash: &str) -> PathBuf {
         let mut p = PathBuf::from(&self.root);
         p.push(format!("{info_hash}.torrent"));
@@ -124,6 +129,8 @@ impl Preload {
     }
 }
 
+/// Non-expensive method to make sure the given string is safe to use in path builders
+/// @TODO implement custom type?
 fn validate_info_hash(value: &str) -> Result<()> {
     if value.len() == 40 && value.chars().all(|c| c.is_ascii_hexdigit()) {
         Ok(())
@@ -132,6 +139,7 @@ fn validate_info_hash(value: &str) -> Result<()> {
     }
 }
 
-fn tmp(info_hash: &str) -> String {
+/// Build constant path component
+fn tmp_component(info_hash: &str) -> String {
     format!(".{info_hash}")
 }
