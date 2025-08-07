@@ -39,8 +39,11 @@ impl Preload {
         torrent_bytes: Vec<u8>,
         persist_files: Option<HashSet<PathBuf>>,
     ) -> Result<()> {
+        if !is_info_hash(info_hash) {
+            bail!("Invalid info-hash `{info_hash}`")
+        }
         // persist torrent bytes to file
-        let t = self.torrent(info_hash)?;
+        let t = self.torrent(info_hash);
         fs::write(&t, torrent_bytes)?;
         log::debug!("persist torrent bytes for `{}`", t.to_string_lossy());
         // persist preload files
@@ -114,16 +117,16 @@ impl Preload {
     }
 
     pub fn contains_torrent(&self, info_hash: &str) -> Result<bool> {
-        Ok(fs::exists(self.torrent(info_hash)?)?)
-    }
-
-    fn torrent(&self, info_hash: &str) -> Result<PathBuf> {
         if !is_info_hash(info_hash) {
             bail!("Invalid info-hash `{info_hash}`")
         }
+        Ok(fs::exists(self.torrent(info_hash))?)
+    }
+
+    fn torrent(&self, info_hash: &str) -> PathBuf {
         let mut p = PathBuf::from(&self.root);
         p.push(format!("{info_hash}.torrent"));
-        Ok(p)
+        p
     }
 }
 
