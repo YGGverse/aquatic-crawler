@@ -39,13 +39,16 @@ impl Preload {
         persist_files: Option<HashSet<PathBuf>>,
     ) -> Result<()> {
         // persist torrent bytes to file
-        fs::write(self.torrent(info_hash)?, torrent_bytes)?;
+        let t = self.torrent(info_hash)?;
+        fs::write(&t, torrent_bytes)?;
+        log::debug!("persist torrent bytes for `{}`", t.to_string_lossy());
         // persist preload files
         let mut d = PathBuf::from(&self.root);
         d.push(info_hash);
         if d.exists() {
             // clean previous data
-            fs::remove_dir_all(&d)?
+            fs::remove_dir_all(&d)?;
+            log::debug!("clean preload content `{}`", d.to_string_lossy())
         }
         if let Some(f) = persist_files {
             let r = d.components().count(); // count root offset once
@@ -69,13 +72,19 @@ impl Preload {
                     )
                 }
                 fs::create_dir_all(n.parent().unwrap())?;
-                fs::rename(o, n)?
+                fs::rename(&o, &n)?;
+                log::debug!(
+                    "persist tmp file `{}` to `{}`",
+                    o.to_string_lossy(),
+                    n.to_string_lossy()
+                )
             }
         }
         // cleanup temporary files
         let t = self.tmp(info_hash, false)?;
         if t.exists() {
-            fs::remove_dir_all(t)?
+            fs::remove_dir_all(&t)?;
+            log::debug!("clean tmp data `{}`", t.to_string_lossy())
         }
         Ok(())
     }
