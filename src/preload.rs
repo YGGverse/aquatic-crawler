@@ -31,7 +31,8 @@ impl Preload {
 
     // Actions
 
-    /// Persist torrent bytes and preloaded content, cleanup tmp (see rqbit#408)
+    /// Persist torrent bytes and preloaded content,
+    /// cleanup tmp data on success (see rqbit#408)
     pub fn commit(
         &self,
         info_hash: &str,
@@ -71,19 +72,20 @@ impl Preload {
                         n.to_string_lossy(),
                     )
                 }
+                // move `persist_files` from temporary to permanent location
                 fs::create_dir_all(n.parent().unwrap())?;
                 fs::rename(&o, &n)?;
                 log::debug!(
                     "persist tmp file `{}` to `{}`",
                     o.to_string_lossy(),
                     n.to_string_lossy()
-                )
+                );
             }
         }
-        // cleanup temporary files
-        let t = self.tmp(info_hash, false)?;
-        if t.exists() {
-            fs::remove_dir_all(&t)?;
+        // cleanup temporary data
+        let tmp = self.tmp(info_hash, false)?;
+        if tmp.exists() {
+            fs::remove_dir_all(&tmp)?;
             log::debug!("clean tmp data `{}`", t.to_string_lossy())
         }
         Ok(())
