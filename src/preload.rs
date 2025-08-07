@@ -87,7 +87,7 @@ impl Preload {
         let tmp = self.tmp(info_hash, false)?;
         if tmp.exists() {
             fs::remove_dir_all(&tmp)?;
-            log::debug!("clean tmp data `{}`", t.to_string_lossy())
+            log::debug!("clean tmp data `{}`", tmp.to_string_lossy())
         }
         Ok(())
     }
