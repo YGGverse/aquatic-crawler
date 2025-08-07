@@ -68,7 +68,7 @@ impl Preload {
                         n.to_string_lossy(),
                     )
                 }
-                // fs::create_dir_all(n.parent().unwrap())?;
+                fs::create_dir_all(n.parent().unwrap())?;
                 fs::rename(o, n)?
             }
         }
