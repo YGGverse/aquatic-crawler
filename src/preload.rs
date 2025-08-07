@@ -73,7 +73,7 @@ impl Preload {
             }
         }
         // cleanup temporary files
-        let t = self.tmp(info_hash)?;
+        let t = self.tmp(info_hash, false)?;
         if t.exists() {
             fs::remove_dir_all(t)?
         }
@@ -83,7 +83,7 @@ impl Preload {
     // Getters
 
     /// * creates new temporary directory if not exists
-    pub fn tmp(&self, info_hash: &str) -> Result<PathBuf> {
+    pub fn tmp(&self, info_hash: &str, is_create: bool) -> Result<PathBuf> {
         if !is_info_hash(info_hash) {
             bail!("Invalid info-hash `{info_hash}`")
         }
@@ -92,7 +92,7 @@ impl Preload {
         if p.is_file() {
             bail!("Output directory `{}` is file", p.to_string_lossy())
         }
-        if !p.exists() {
+        if is_create && !p.exists() {
             fs::create_dir(&p)?
         }
         Ok(p)
