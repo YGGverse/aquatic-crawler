@@ -169,7 +169,7 @@ async fn main() -> Result<()> {
                             mt.wait_until_completed().await?;
                             // persist torrent bytes and preloaded content,
                             // cleanup tmp (see rqbit#408)
-                            preload.commit(&i, &bytes, Some(keep_files))?;
+                            preload.commit(&i, bytes, Some(keep_files))?;
                             // remove torrent from session as indexed
                             session
                                 .delete(librqbit::api::TorrentIdOrHash::Id(id), false)

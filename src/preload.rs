@@ -35,7 +35,7 @@ impl Preload {
     pub fn commit(
         &self,
         info_hash: &str,
-        torrent_bytes: &[u8],
+        torrent_bytes: Vec<u8>,
         persist_files: Option<HashSet<PathBuf>>,
     ) -> Result<()> {
         // persist torrent bytes to file
