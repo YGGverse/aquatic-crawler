@@ -21,7 +21,6 @@ tokio = { version = "1.45", features = ["full"] }
 tracing-subscriber = "0.3"
 url = "2.5"
 urlencoding = "2.1"
-walkdir = "2.5"
 
 [patch.crates-io]
 librqbit = { git = "https://github.com/ikatson/rqbit.git", rev="b580a9610ae7c6eaacd305a3905f7e2d3202ca69", package = "librqbit" }

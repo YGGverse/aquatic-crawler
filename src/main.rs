@@ -116,12 +116,9 @@ async fn main() -> Result<()> {
                             only_files: Some(Vec::with_capacity(
                                 config.preload_max_filecount.unwrap_or_default(),
                             )),
-                            // the destination folder to preload files match `only_files_regex`
+                            // the destination folder to preload files match `preload_regex`
                             // * e.g. images for audio albums
-                            output_folder: preload
-                                .output_folder(&i)?
-                                .to_str()
-                                .map(|s| s.to_string()),
+                            output_folder: preload.tmp(&i)?.to_str().map(|s| s.to_string()),
                             ..Default::default()
                         }),
                     ),
@@ -170,9 +167,9 @@ async fn main() -> Result<()> {
                             session.unpause(&mt).await?;
                             // await for `preload_regex` files download to continue
                             mt.wait_until_completed().await?;
-                            // cleanup irrelevant files (see rqbit#408)
-                            preload.cleanup(&i, Some(keep_files))?;
-                            preload.persist_torrent_bytes(&i, &bytes)?;
+                            // persist torrent bytes and preloaded content,
+                            // cleanup tmp (see rqbit#408)
+                            preload.commit(&i, &bytes, Some(keep_files))?;
                             // remove torrent from session as indexed
                             session
                                 .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
