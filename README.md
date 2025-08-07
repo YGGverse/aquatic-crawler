@@ -23,7 +23,8 @@ SSD-friendly FS crawler for the [Aquatic](https://github.com/greatest-ape/aquati
 ## Usage
 
 > [!TIP]
-> Prepend `RUST_LOG=debug` to debug
+> * prepend `RUST_LOG=debug` to debug
+> * use `--preload-*` arguments group to avoid preloading everything (by default)
 
 ``` bash
 aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
