@@ -39,9 +39,7 @@ impl Preload {
         torrent_bytes: Vec<u8>,
         persist_files: Option<HashSet<PathBuf>>,
     ) -> Result<()> {
-        if !is_info_hash(info_hash) {
-            bail!("Invalid info-hash `{info_hash}`")
-        }
+        validate_info_hash(info_hash)?;
         // persist torrent bytes to file
         let t = self.torrent(info_hash);
         fs::write(&t, torrent_bytes)?;
@@ -98,9 +96,7 @@ impl Preload {
 
     /// * creates new temporary directory if not exists
     pub fn tmp(&self, info_hash: &str, is_create: bool) -> Result<PathBuf> {
-        if !is_info_hash(info_hash) {
-            bail!("Invalid info-hash `{info_hash}`")
-        }
+        validate_info_hash(info_hash)?;
         let mut p = PathBuf::from(&self.root);
         p.push(tmp(info_hash));
         if p.is_file() {
@@ -117,9 +113,7 @@ impl Preload {
     }
 
     pub fn contains_torrent(&self, info_hash: &str) -> Result<bool> {
-        if !is_info_hash(info_hash) {
-            bail!("Invalid info-hash `{info_hash}`")
-        }
+        validate_info_hash(info_hash)?;
         Ok(fs::exists(self.torrent(info_hash))?)
     }
 
@@ -130,8 +124,12 @@ impl Preload {
     }
 }
 
-fn is_info_hash(value: &str) -> bool {
-    value.len() == 40 && value.chars().all(|c| c.is_ascii_hexdigit())
+fn validate_info_hash(value: &str) -> Result<()> {
+    if value.len() == 40 && value.chars().all(|c| c.is_ascii_hexdigit()) {
+        Ok(())
+    } else {
+        bail!("Invalid info-hash value `{value}`")
+    }
 }
 
 fn tmp(info_hash: &str) -> String {
