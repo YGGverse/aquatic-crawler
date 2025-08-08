@@ -12,6 +12,10 @@ pub struct Config {
     #[arg(long)]
     pub infohash: Vec<String>,
 
+    /// Remote address or local path
+    #[arg(long)]
+    pub blocklist: Option<Url>,
+
     /// Define custom tracker(s) to preload the `.torrent` files info
     #[arg(long)]
     pub tracker: Vec<Url>,

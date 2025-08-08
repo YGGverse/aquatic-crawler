@@ -34,6 +34,7 @@ async fn main() -> Result<()> {
         preload.root().clone(),
         SessionOptions {
             bind_device_name: config.bind,
+            blocklist_url: config.blocklist.map(|b| b.into()),
             listen: match config.listen {
                 Some(listen_addr) => Some(ListenerOptions {
                     enable_upnp_port_forwarding: config.listen_upnp,
