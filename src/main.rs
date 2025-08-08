@@ -151,7 +151,7 @@ async fn main() -> Result<()> {
                                     }
                                     if preload.max_filesize.is_some_and(|limit| info.len > limit) {
                                         log::debug!(
-                                            "file size ({} B) limit reached, skip file `{id}` for `{i}` at `{}`",
+                                            "file size ({}) limit reached, skip file `{id}` for `{i}` at `{}`",
                                             info.len,
                                             info.relative_filename.to_string_lossy()
                                         );
@@ -190,7 +190,7 @@ async fn main() -> Result<()> {
                             log::debug!("torrent `{i}` resolved.")
                         }
                         Ok(_) => panic!(),
-                        Err(e) => log::debug!("Failed to resolve `{i}`: `{e}`."),
+                        Err(e) => log::debug!("failed to resolve `{i}`: `{e}`."),
                     },
                     Err(e) => log::debug!("failed to resolve `{i}`: `{e}`"),
                 }
