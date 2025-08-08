@@ -40,49 +40,43 @@ impl Preload {
         torrent_bytes: Vec<u8>,
         persist_files: Option<HashSet<PathBuf>>,
     ) -> Result<()> {
-        // persist preload files
-        let mut d = PathBuf::from(&self.root);
-        d.push(info_hash);
-        if d.exists() {
-            // clean previous data
-            fs::remove_dir_all(&d)?;
-            log::debug!("clean previous data `{}`", d.to_string_lossy())
-        }
+        // persist preloaded files
+        let permanent_dir = self.permanent_dir(info_hash, true)?;
         // init temporary path without creating the dir (delegate to `librqbit`)
-        let tmp_dir = self.tmp(info_hash, false)?;
-        if let Some(f) = persist_files {
-            let r = d.components().count(); // count root offset once
-            for p in f {
-                // build the absolute path for the relative torrent file
-                let o = {
-                    let mut t = PathBuf::from(&tmp_dir);
-                    t.push(p);
-                    t.canonicalize()?
+        let tmp_dir = self.tmp_dir(info_hash, false)?;
+        if let Some(files) = persist_files {
+            let components_count = permanent_dir.components().count(); // count root offset once
+            for file in files {
+                // build the absolute path for the relative torrent filename
+                let tmp_file = {
+                    let mut p = PathBuf::from(&tmp_dir);
+                    p.push(file);
+                    p.canonicalize()?
                 };
                 // make sure preload path is referring to the expected location
-                if !o.starts_with(&self.root) || o.is_dir() {
-                    bail!("unexpected canonical path `{}`", o.to_string_lossy())
+                if !tmp_file.starts_with(&self.root) || tmp_file.is_dir() {
+                    bail!("unexpected canonical path `{}`", tmp_file.to_string_lossy())
                 }
                 // build new permanent path /root/info-hash
-                let mut n = PathBuf::from(&d);
-                for component in o.components().skip(r) {
-                    n.push(component)
+                let mut permanent_file = PathBuf::from(&permanent_dir);
+                for component in tmp_file.components().skip(components_count) {
+                    permanent_file.push(component)
                 }
                 // make sure segments count is same to continue
-                if o.components().count() != n.components().count() {
+                if tmp_file.components().count() != permanent_file.components().count() {
                     bail!(
                         "unexpected components count: `{}` > `{}`",
-                        o.to_string_lossy(),
-                        n.to_string_lossy(),
+                        tmp_file.to_string_lossy(),
+                        permanent_file.to_string_lossy(),
                     )
                 }
                 // move `persist_files` from temporary to permanent location
-                fs::create_dir_all(n.parent().unwrap())?;
-                fs::rename(&o, &n)?;
+                fs::create_dir_all(permanent_file.parent().unwrap())?;
+                fs::rename(&tmp_file, &permanent_file)?;
                 log::debug!(
                     "persist tmp file `{}` to `{}`",
-                    o.to_string_lossy(),
-                    n.to_string_lossy()
+                    tmp_file.to_string_lossy(),
+                    permanent_file.to_string_lossy()
                 );
             }
         }
@@ -92,17 +86,20 @@ impl Preload {
             log::debug!("clean tmp data `{}`", tmp_dir.to_string_lossy())
         }
         // persist torrent bytes to file (on previous operations success)
-        let t = self.torrent(info_hash);
-        fs::write(&t, torrent_bytes)?;
-        log::debug!("persist torrent bytes for `{}`", t.to_string_lossy());
+        let torrent_file = self.torrent(info_hash);
+        fs::write(&torrent_file, torrent_bytes)?;
+        log::debug!(
+            "persist torrent bytes for `{}`",
+            torrent_file.to_string_lossy()
+        );
         Ok(())
     }
 
-    // Getters
+    // Actions
 
-    /// Get absolute path to the temporary directory
+    /// Build the absolute path to the temporary directory
     /// * optionally creates directory if not exists
-    pub fn tmp(&self, info_hash: &str, is_create: bool) -> Result<PathBuf> {
+    pub fn tmp_dir(&self, info_hash: &str, is_create: bool) -> Result<PathBuf> {
         let mut p = PathBuf::from(&self.root);
         p.push(tmp_component(info_hash));
         if p.is_file() {
@@ -114,6 +111,24 @@ impl Preload {
         }
         Ok(p)
     }
+
+    /// Build the absolute path to the permanent directory
+    /// * optionally removes directory with its content
+    fn permanent_dir(&self, info_hash: &str, is_clear: bool) -> Result<PathBuf> {
+        let mut p = PathBuf::from(&self.root);
+        p.push(info_hash);
+        if p.is_file() {
+            bail!("permanent directory `{}` is file", p.to_string_lossy())
+        }
+        if is_clear && p.exists() {
+            // clean previous data
+            fs::remove_dir_all(&p)?;
+            log::debug!("clean previous data `{}`", p.to_string_lossy())
+        }
+        Ok(p)
+    }
+
+    // Getters
 
     /// Get root location for `Self`
     pub fn root(&self) -> &PathBuf {

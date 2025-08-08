@@ -119,7 +119,10 @@ async fn main() -> Result<()> {
                             )),
                             // the destination folder to preload files match `preload_regex`
                             // * e.g. images for audio albums
-                            output_folder: preload.tmp(&i, true)?.to_str().map(|s| s.to_string()),
+                            output_folder: preload
+                                .tmp_dir(&i, true)?
+                                .to_str()
+                                .map(|s| s.to_string()),
                             ..Default::default()
                         }),
                     ),
