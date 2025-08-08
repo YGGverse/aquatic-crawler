@@ -143,14 +143,16 @@ async fn main() -> Result<()> {
                                         .is_some_and(|limit| only_files.len() + 1 > limit)
                                     {
                                         log::debug!(
-                                            "file count limit reached, skip file `{id}` for `{i}` at `{}`",
+                                            "file count limit ({}) reached, skip file `{id}` for `{i}` at `{}` (and other files after it)",
+                                            only_files.len(),
                                             info.relative_filename.to_string_lossy()
                                         );
                                         break;
                                     }
                                     if preload.max_filesize.is_some_and(|limit| info.len > limit) {
                                         log::debug!(
-                                            "file size limit reached, skip file `{id}` for `{i}` at `{}`",
+                                            "file size ({} B) limit reached, skip file `{id}` for `{i}` at `{}`",
+                                            info.len,
                                             info.relative_filename.to_string_lossy()
                                         );
                                         continue;
