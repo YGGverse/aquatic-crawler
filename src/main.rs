@@ -143,24 +143,27 @@ async fn main() -> Result<()> {
                                         .is_some_and(|limit| only_files.len() + 1 > limit)
                                     {
                                         log::debug!(
-                                            "file count limit reached, skip file #`{id}` for `{i}`"
+                                            "file count limit reached, skip file `{id}` for `{i}` at `{}`",
+                                            info.relative_filename.to_string_lossy()
                                         );
                                         break;
                                     }
                                     if preload.max_filesize.is_some_and(|limit| info.len > limit) {
                                         log::debug!(
-                                            "file size limit reached, skip file #`{id}` for `{i}`"
+                                            "file size limit reached, skip file `{id}` for `{i}` at `{}`",
+                                            info.relative_filename.to_string_lossy()
                                         );
                                         continue;
                                     }
                                     if preload.regex.as_ref().is_some_and(|r| {
                                         !r.is_match(&info.relative_filename.to_string_lossy())
                                     }) {
-                                        log::debug!("regex filter, skip file #`{id}` for `{i}`");
+                                        log::debug!("regex filter, skip file `{id}` for `{i}` at `{}`",
+                                        info.relative_filename.to_string_lossy());
                                         continue;
                                     }
                                     log::debug!(
-                                        "keep file #`{id}` for `{i}` as `{}`",
+                                        "keep file `{id}` for `{i}` as `{}`",
                                         info.relative_filename.to_string_lossy()
                                     );
                                     assert!(keep_files.insert(info.relative_filename.clone()));
