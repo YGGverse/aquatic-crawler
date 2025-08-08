@@ -1,5 +1,4 @@
 use anyhow::{Result, bail};
-use librqbit::dht::Id20;
 use regex::Regex;
 use std::{collections::HashSet, fs, path::PathBuf};
 
@@ -37,14 +36,13 @@ impl Preload {
     /// cleanup tmp data on success (see rqbit#408)
     pub fn commit(
         &self,
-        info_hash: &Id20,
+        info_hash: &str,
         torrent_bytes: Vec<u8>,
         persist_files: Option<HashSet<PathBuf>>,
     ) -> Result<()> {
-        let i = info_hash.as_string();
         // persist preload files
         let mut d = PathBuf::from(&self.root);
-        d.push(&i);
+        d.push(info_hash);
         if d.exists() {
             // clean previous data
             fs::remove_dir_all(&d)?;
@@ -88,7 +86,7 @@ impl Preload {
             log::debug!("clean tmp data `{}`", tmp.to_string_lossy())
         }
         // persist torrent bytes to file (on previous operations success)
-        let t = self.torrent(i);
+        let t = self.torrent(info_hash);
         fs::write(&t, torrent_bytes)?;
         log::debug!("persist torrent bytes for `{}`", t.to_string_lossy());
         Ok(())
@@ -98,9 +96,9 @@ impl Preload {
 
     /// Get absolute path to the temporary directory
     /// * optionally creates directory if not exists
-    pub fn tmp(&self, info_hash: &Id20, is_create: bool) -> Result<PathBuf> {
+    pub fn tmp(&self, info_hash: &str, is_create: bool) -> Result<PathBuf> {
         let mut p = PathBuf::from(&self.root);
-        p.push(tmp_component(info_hash.as_string()));
+        p.push(tmp_component(info_hash));
         if p.is_file() {
             bail!("Output directory `{}` is file", p.to_string_lossy())
         }
@@ -117,12 +115,12 @@ impl Preload {
     }
 
     /// Check the given hash is contain resolved torrent file
-    pub fn contains_torrent(&self, info_hash: &Id20) -> Result<bool> {
-        Ok(fs::exists(self.torrent(info_hash.as_string()))?)
+    pub fn contains_torrent(&self, info_hash: &str) -> Result<bool> {
+        Ok(fs::exists(self.torrent(info_hash))?)
     }
 
     /// Get absolute path to the torrent file
-    fn torrent(&self, info_hash: String) -> PathBuf {
+    fn torrent(&self, info_hash: &str) -> PathBuf {
         let mut p = PathBuf::from(&self.root);
         p.push(format!("{info_hash}.torrent"));
         p
@@ -130,6 +128,6 @@ impl Preload {
 }
 
 /// Build constant path component
-fn tmp_component(info_hash: String) -> String {
+fn tmp_component(info_hash: &str) -> String {
     format!(".{info_hash}")
 }

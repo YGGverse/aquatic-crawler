@@ -89,18 +89,18 @@ async fn main() -> Result<()> {
                 }
             } {
                 // convert to string once
-                let is = i.as_string();
+                let i = i.as_string();
                 if preload.contains_torrent(&i)? {
                     continue;
                 }
-                log::debug!("Index `{is}`...");
+                log::debug!("Index `{i}`...");
                 // run the crawler in single thread for performance reasons,
                 // use `timeout` argument option to skip the dead connections.
                 match time::timeout(
                     Duration::from_secs(config.add_torrent_timeout),
                     session.add_torrent(
                         AddTorrent::from_url(magnet(
-                            &is,
+                            &i,
                             if config.tracker.is_empty() {
                                 None
                             } else {
@@ -143,20 +143,20 @@ async fn main() -> Result<()> {
                                         .is_some_and(|limit| only_files.len() + 1 > limit)
                                     {
                                         log::debug!(
-                                            "file count limit reached, skip `{id}` for `{is}`"
+                                            "file count limit reached, skip `{id}` for `{i}`"
                                         );
                                         break;
                                     }
                                     if preload.max_filesize.is_some_and(|limit| info.len > limit) {
                                         log::debug!(
-                                            "file size limit reached, skip `{id}` for `{is}`"
+                                            "file size limit reached, skip `{id}` for `{i}`"
                                         );
                                         continue;
                                     }
                                     if preload.regex.as_ref().is_some_and(|r| {
                                         !r.is_match(&info.relative_filename.to_string_lossy())
                                     }) {
-                                        log::debug!("regex filter, skip `{id}` for `{is}`");
+                                        log::debug!("regex filter, skip `{id}` for `{i}`");
                                         continue;
                                     }
                                     assert!(keep_files.insert(info.relative_filename.clone()));
@@ -175,12 +175,12 @@ async fn main() -> Result<()> {
                             session
                                 .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                 .await?;
-                            log::debug!("torrent `{is}` indexed.")
+                            log::debug!("torrent `{i}` indexed.")
                         }
                         Ok(_) => panic!(),
-                        Err(e) => log::debug!("Failed to resolve `{is}`: `{e}`."),
+                        Err(e) => log::debug!("Failed to resolve `{i}`: `{e}`."),
                     },
-                    Err(e) => log::debug!("failed to resolve `{is}`: `{e}`"),
+                    Err(e) => log::debug!("failed to resolve `{i}`: `{e}`"),
                 }
             }
         }
