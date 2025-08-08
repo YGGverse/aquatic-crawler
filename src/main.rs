@@ -170,16 +170,19 @@ async fn main() -> Result<()> {
                             })?;
                             session.update_only_files(&mt, &only_files).await?;
                             session.unpause(&mt).await?;
+                            log::debug!("begin torrent `{i}` preload...");
                             // await for `preload_regex` files download to continue
                             mt.wait_until_completed().await?;
+                            log::debug!("begin torrent `{i}` preload completed.");
                             // persist torrent bytes and preloaded content,
                             // cleanup tmp (see rqbit#408)
+                            log::debug!("persist data for torrent `{i}`...");
                             preload.commit(&i, bytes, Some(keep_files))?;
                             // remove torrent from session as indexed
                             session
                                 .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                 .await?;
-                            log::debug!("torrent `{i}` indexed.")
+                            log::debug!("torrent `{i}` resolved.")
                         }
                         Ok(_) => panic!(),
                         Err(e) => log::debug!("Failed to resolve `{i}`: `{e}`."),
