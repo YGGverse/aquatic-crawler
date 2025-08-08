@@ -54,22 +54,14 @@ impl Preload {
                     p.canonicalize()?
                 };
                 // make sure preload path is referring to the expected location
-                if !tmp_file.starts_with(&self.root) || tmp_file.is_dir() {
-                    bail!("unexpected canonical path `{}`", tmp_file.to_string_lossy())
-                }
+                assert!(tmp_file.starts_with(&self.root) && !tmp_file.is_dir());
                 // build new permanent path /root/info-hash
                 let mut permanent_file = PathBuf::from(&permanent_dir);
                 for component in tmp_file.components().skip(components_count) {
                     permanent_file.push(component)
                 }
                 // make sure segments count is same to continue
-                if tmp_file.components().count() != permanent_file.components().count() {
-                    bail!(
-                        "unexpected components count: `{}` > `{}`",
-                        tmp_file.to_string_lossy(),
-                        permanent_file.to_string_lossy(),
-                    )
-                }
+                assert!(tmp_file.components().count() == permanent_file.components().count());
                 // move `persist_files` from temporary to permanent location
                 fs::create_dir_all(permanent_file.parent().unwrap())?;
                 fs::rename(&tmp_file, &permanent_file)?;
@@ -102,9 +94,7 @@ impl Preload {
     pub fn tmp_dir(&self, info_hash: &str, is_create: bool) -> Result<PathBuf> {
         let mut p = PathBuf::from(&self.root);
         p.push(tmp_component(info_hash));
-        if p.is_file() {
-            bail!("output directory `{}` is file", p.to_string_lossy())
-        }
+        assert!(!p.is_file());
         if is_create && !p.exists() {
             fs::create_dir(&p)?;
             log::debug!("create tmp directory `{}`", p.to_string_lossy())
@@ -117,9 +107,7 @@ impl Preload {
     fn permanent_dir(&self, info_hash: &str, is_clear: bool) -> Result<PathBuf> {
         let mut p = PathBuf::from(&self.root);
         p.push(info_hash);
-        if p.is_file() {
-            bail!("permanent directory `{}` is file", p.to_string_lossy())
-        }
+        assert!(!p.is_file());
         if is_clear && p.exists() {
             // clean previous data
             fs::remove_dir_all(&p)?;
@@ -144,6 +132,7 @@ impl Preload {
     fn torrent(&self, info_hash: &str) -> PathBuf {
         let mut p = PathBuf::from(&self.root);
         p.push(format!("{info_hash}.torrent"));
+        assert!(!p.is_dir());
         p
     }
 }
