@@ -181,7 +181,10 @@ async fn main() -> Result<()> {
                             log::debug!("begin torrent `{i}` preload completed.");
                             // persist torrent bytes and preloaded content,
                             // cleanup tmp (see rqbit#408)
-                            log::debug!("persist data for torrent `{i}`...");
+                            log::debug!(
+                                "persist torrent `{i}` with `{}` files...",
+                                keep_files.len()
+                            );
                             preload.commit(&i, bytes, Some(keep_files))?;
                             // remove torrent from session as indexed
                             session
