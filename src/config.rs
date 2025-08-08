@@ -12,7 +12,9 @@ pub struct Config {
     #[arg(long)]
     pub infohash: Vec<String>,
 
-    /// Remote address or local path
+    /// The P2P Blocklist file URL (to filter outgoing connections)
+    ///
+    /// * use `--blocklist=file:///path/to/blocklist.txt` format for the local path
     #[arg(long)]
     pub blocklist: Option<Url>,
 
