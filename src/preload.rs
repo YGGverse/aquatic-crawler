@@ -46,13 +46,20 @@ impl Preload {
         if d.exists() {
             // clean previous data
             fs::remove_dir_all(&d)?;
-            log::debug!("clean preload content `{}`", d.to_string_lossy())
+            log::debug!("clean previous data `{}`", d.to_string_lossy())
         }
+        // init temporary path without creating the dir (delegate to `librqbit`)
+        let tmp_dir = self.tmp(info_hash, false)?;
         if let Some(f) = persist_files {
             let r = d.components().count(); // count root offset once
             for p in f {
+                // build the absolute path for the relative torrent file
+                let o = {
+                    let mut t = PathBuf::from(&tmp_dir);
+                    t.push(p);
+                    t.canonicalize()?
+                };
                 // make sure preload path is referring to the expected location
-                let o = p.canonicalize()?;
                 if !o.starts_with(&self.root) || o.is_dir() {
                     bail!("unexpected canonical path `{}`", o.to_string_lossy())
                 }
@@ -80,10 +87,9 @@ impl Preload {
             }
         }
         // cleanup temporary data
-        let tmp = self.tmp(info_hash, false)?;
-        if tmp.exists() {
-            fs::remove_dir_all(&tmp)?;
-            log::debug!("clean tmp data `{}`", tmp.to_string_lossy())
+        if tmp_dir.exists() {
+            fs::remove_dir_all(&tmp_dir)?;
+            log::debug!("clean tmp data `{}`", tmp_dir.to_string_lossy())
         }
         // persist torrent bytes to file (on previous operations success)
         let t = self.torrent(info_hash);
