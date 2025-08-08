@@ -1,11 +1,10 @@
-mod info_hash;
-use info_hash::InfoHash;
+use librqbit::dht::Id20;
 
 /// Parse infohash from the source filepath,
 /// decode hash bytes to `InfoHash` array on success.
 ///
 /// * return `None` if the `path` is not reachable
-pub fn get(path: &str, capacity: usize) -> Option<Vec<InfoHash>> {
+pub fn get(path: &str, capacity: usize) -> Option<Vec<Id20>> {
     use std::io::Read;
     if !path.ends_with(".bin") {
         todo!("Only sources in the `.bin` format are supported!")
@@ -21,7 +20,7 @@ pub fn get(path: &str, capacity: usize) -> Option<Vec<InfoHash>> {
         if f.read(&mut b).ok()? != L {
             break;
         }
-        r.push(InfoHash::V1(b))
+        r.push(Id20::from_bytes(&b).ok()?)
     }
     Some(r)
 }
