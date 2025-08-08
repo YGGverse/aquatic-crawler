@@ -22,7 +22,7 @@ torrent client               <-----------------------|          * /preload/info-
 
 ## Install
 
-> [!NOTE]
+> [!TIP]
 > You may want to install some [system dependencies](https://github.com/YGGverse/aquatic-crawler/wiki/Dependencies)
 
 1. `git clone https://github.com/YGGverse/aquatic-crawler.git && cd aquatic-crawler`
