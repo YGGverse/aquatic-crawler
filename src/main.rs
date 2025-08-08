@@ -182,7 +182,7 @@ async fn main() -> Result<()> {
                             log::debug!("begin torrent `{i}` preload...");
                             // await for `preload_regex` files download to continue
                             mt.wait_until_completed().await?;
-                            log::debug!("begin torrent `{i}` preload completed.");
+                            log::debug!("torrent `{i}` preload completed.");
                             // persist torrent bytes and preloaded content,
                             // cleanup tmp (see rqbit#408)
                             log::debug!(
@@ -194,7 +194,7 @@ async fn main() -> Result<()> {
                             if !config.enable_upload {
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
-                                    .await?;
+                                    .await?
                             }
                             log::debug!("torrent `{i}` resolved.")
                         }
