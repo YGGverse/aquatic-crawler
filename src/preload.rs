@@ -41,10 +41,6 @@ impl Preload {
         persist_files: Option<HashSet<PathBuf>>,
     ) -> Result<()> {
         validate_info_hash(info_hash)?;
-        // persist torrent bytes to file
-        let t = self.torrent(info_hash);
-        fs::write(&t, torrent_bytes)?;
-        log::debug!("persist torrent bytes for `{}`", t.to_string_lossy());
         // persist preload files
         let mut d = PathBuf::from(&self.root);
         d.push(info_hash);
@@ -90,6 +86,10 @@ impl Preload {
             fs::remove_dir_all(&tmp)?;
             log::debug!("clean tmp data `{}`", tmp.to_string_lossy())
         }
+        // persist torrent bytes to file (on previous operations success)
+        let t = self.torrent(info_hash);
+        fs::write(&t, torrent_bytes)?;
+        log::debug!("persist torrent bytes for `{}`", t.to_string_lossy());
         Ok(())
     }
 
