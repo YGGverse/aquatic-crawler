@@ -10,6 +10,7 @@ SSD-friendly FS crawler for the [Aquatic](https://github.com/greatest-ape/aquati
 > * requires PR#233 or the [info-hash-api](https://github.com/YGGverse/aquatic/tree/info-hash-api) branch implementation
 > * compatible with any other `--infohash` source in `hash1hash2...` binary format (see the [Online API](https://github.com/YGGverse/aquatic-crawler/wiki/Online-API))
 > * use [βtracker](https://github.com/YGGverse/btracker/) for the frontend
+> * see the project [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki) for details
 
 ## Install
 
