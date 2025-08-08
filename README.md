@@ -23,8 +23,9 @@ SSD-friendly FS crawler for the [Aquatic](https://github.com/greatest-ape/aquati
 ## Usage
 
 > [!TIP]
-> * prepend `RUST_LOG=debug` to debug
+> * prepend `RUST_LOG=debug` to debug, append `NO_COLOR=1` to disable fmt
 > * use `--preload-*` arguments group to avoid preloading everything (by default)
+> * as the crawler is running in a single thread, use `--peer-read-write-timeout` (in seconds) to skip long-lasting connections. Content preload will be restored in the next crawl cycle after resolving other torrents from active peers in the queue.
 
 ``` bash
 aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
