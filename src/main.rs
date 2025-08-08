@@ -161,6 +161,10 @@ async fn main() -> Result<()> {
                                     }
                                     assert!(keep_files.insert(info.relative_filename.clone()));
                                     assert!(only_files.insert(id));
+                                    log::debug!(
+                                        "persist `{}` for `{i}`",
+                                        info.relative_filename.to_string_lossy()
+                                    )
                                 }
                                 m.torrent_bytes.to_vec()
                             })?;
