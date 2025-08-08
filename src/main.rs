@@ -56,9 +56,10 @@ async fn main() -> Result<()> {
                     keep_alive_interval: config.peer_keep_alive_interval.map(Duration::from_secs),
                 }),
             }),
-            disable_upload: !config.enable_upload,
-            disable_dht: !config.enable_dht,
             disable_dht_persistence: true,
+            disable_dht: !config.enable_dht,
+            disable_local_service_discovery: !config.enable_lsd,
+            disable_upload: !config.enable_upload,
             persistence: None,
             ratelimits: librqbit::limits::LimitsConfig {
                 upload_bps: config.upload_limit.and_then(NonZero::new),
