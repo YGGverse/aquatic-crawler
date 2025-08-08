@@ -6,11 +6,19 @@
 
 SSD-friendly FS crawler for the [Aquatic](https://github.com/greatest-ape/aquatic) BitTorrent tracker, based on the [librqbit](https://github.com/ikatson/rqbit/tree/main/crates/librqbit) API
 
-> [!TIP]
+> [!NOTE]
 > * requires PR#233 or the [info-hash-api](https://github.com/YGGverse/aquatic/tree/info-hash-api) branch implementation
 > * compatible with any other `--infohash` source in `hash1hash2...` binary format (see the [Online API](https://github.com/YGGverse/aquatic-crawler/wiki/Online-API))
 > * use [βtracker](https://github.com/YGGverse/btracker/) for the frontend
 > * see the project [Wiki](https://github.com/YGGverse/aquatic-crawler/wiki) for details
+
+## Conception
+
+```
+torrent client > aquatic_udp > infohash.bin < aquatic-crawler > * /preload/info-hash.torrent
+torrent client               <-----------------------|          * /preload/info-hash/data
+               <-------------------------------------|          * /preload/.info-hash/tmp
+```
 
 ## Install
 
