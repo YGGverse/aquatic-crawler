@@ -190,10 +190,12 @@ async fn main() -> Result<()> {
                                 keep_files.len()
                             );
                             preload.commit(&i, bytes, Some(keep_files))?;
-                            // remove torrent from session as indexed
-                            session
-                                .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
-                                .await?;
+                            // remove torrent from the session as indexed
+                            if !config.enable_upload {
+                                session
+                                    .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
+                                    .await?;
+                            }
                             log::debug!("torrent `{i}` resolved.")
                         }
                         Ok(_) => panic!(),
