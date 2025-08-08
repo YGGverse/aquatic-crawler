@@ -54,7 +54,7 @@ impl Preload {
                 // make sure preload path is referring to the expected location
                 let o = p.canonicalize()?;
                 if !o.starts_with(&self.root) || o.is_dir() {
-                    bail!("Unexpected canonical path `{}`", o.to_string_lossy())
+                    bail!("unexpected canonical path `{}`", o.to_string_lossy())
                 }
                 // build new permanent path /root/info-hash
                 let mut n = PathBuf::from(&d);
@@ -64,7 +64,7 @@ impl Preload {
                 // make sure segments count is same to continue
                 if o.components().count() != n.components().count() {
                     bail!(
-                        "Unexpected components count: `{}` > `{}`",
+                        "unexpected components count: `{}` > `{}`",
                         o.to_string_lossy(),
                         n.to_string_lossy(),
                     )
@@ -100,7 +100,7 @@ impl Preload {
         let mut p = PathBuf::from(&self.root);
         p.push(tmp_component(info_hash));
         if p.is_file() {
-            bail!("Output directory `{}` is file", p.to_string_lossy())
+            bail!("output directory `{}` is file", p.to_string_lossy())
         }
         if is_create && !p.exists() {
             fs::create_dir(&p)?;

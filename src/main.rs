@@ -70,12 +70,12 @@ async fn main() -> Result<()> {
         },
     )
     .await?;
-    log::info!("Crawler started on {time_init}");
+    log::info!("crawler started at {time_init}");
     loop {
         let time_queue = Local::now();
-        log::debug!("Queue crawl begin on {time_queue}...");
+        log::debug!("queue crawl begin at {time_queue}...");
         for source in &config.infohash {
-            log::debug!("Index source `{source}`...");
+            log::debug!("index source `{source}`...");
             // grab latest info-hashes from this source
             // * aquatic server may update the stats at this moment, handle result manually
             for i in match api::get(source, config.index_capacity) {
@@ -83,7 +83,7 @@ async fn main() -> Result<()> {
                 None => {
                     // skip without panic
                     log::warn!(
-                        "The feed `{source}` has an incomplete format (or is still updating); skip."
+                        "the feed `{source}` has an incomplete format (or is still updating); skip."
                     );
                     continue;
                 }
@@ -93,7 +93,7 @@ async fn main() -> Result<()> {
                 if preload.contains_torrent(&i)? {
                     continue;
                 }
-                log::debug!("Index `{i}`...");
+                log::debug!("index `{i}`...");
                 // run the crawler in single thread for performance reasons,
                 // use `timeout` argument option to skip the dead connections.
                 match time::timeout(
@@ -197,7 +197,7 @@ async fn main() -> Result<()> {
             }
         }
         log::debug!(
-            "Queue completed at {time_queue} (time: {} / uptime: {}) await {} seconds to continue...",
+            "queue completed at {time_queue} (time: {} / uptime: {}) await {} seconds to continue...",
             Local::now()
                 .signed_duration_since(time_queue)
                 .as_seconds_f32(),
