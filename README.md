@@ -42,7 +42,11 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
                 --infohash /path/to/another-source.bin\
                 --tracker  udp://host1:port\
                 --tracker  udp://host2:port\
-                --preload  /path/to/directory
+                --preload  /path/to/directory\
+                --preload-max-filesize=50000\
+                --preload-max-filecount=1\
+                --preload-regex="\.(png|gif|jpeg|jpg|webp)$"\
+                --peer-read-write-timeout=10
 ```
 
 ### Options
