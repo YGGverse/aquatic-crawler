@@ -72,7 +72,7 @@ pub struct Config {
     ///
     /// Filter by image ext
     /// ```
-    /// --preload-regex '\.(png|gif|jpeg|jpg|webp)$'
+    /// --preload-regex '\.(png|gif|jpeg|jpg|webp|svg|log|txt)$'
     /// ```
     ///
     /// * requires `storage` argument defined
