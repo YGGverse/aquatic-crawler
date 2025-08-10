@@ -106,7 +106,7 @@ pub struct Config {
     pub index_capacity: usize,
 
     /// Max time to handle each torrent
-    #[arg(long, default_value_t = 10)]
+    #[arg(long, default_value_t = 60)]
     pub add_torrent_timeout: u64,
 
     /// Crawl loop delay in seconds
@@ -123,6 +123,6 @@ pub struct Config {
 
     /// Skip long-thinking connections,
     /// try to handle the other hashes in this queue after `n` seconds
-    #[arg(long, default_value_t = 10)]
+    #[arg(long, default_value_t = 60)]
     pub wait_until_completed: u64,
 }
