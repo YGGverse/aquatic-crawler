@@ -196,7 +196,7 @@ async fn main() -> Result<()> {
                                 } else {
                                     session
                                         .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
-                                        .await?;
+                                        .await?
                                 }
                                 continue;
                             }
@@ -217,7 +217,8 @@ async fn main() -> Result<()> {
                         }
                         Ok(AddTorrentResponse::AlreadyManaged(..)) => {
                             if config.enable_upload {
-                                log::debug!("keep sharing the existing torrent data for `{i}`.")
+                                todo!()
+                                //log::debug!("keep sharing the existing torrent data for `{i}`.")
                             } else {
                                 panic!("torrent `{i}` was not removed properly!")
                             }
