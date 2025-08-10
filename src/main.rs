@@ -181,7 +181,7 @@ async fn main() -> Result<()> {
                                 );
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
-                                    .await?;
+                                    .await?; // * do not collect billions of slow torrents in the session pool
                                 continue;
                             }
                             log::debug!("torrent `{i}` preload completed.");
@@ -194,7 +194,7 @@ async fn main() -> Result<()> {
                             preload.commit(&i, bytes, Some(keep_files))?;
                             session
                                 .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
-                                .await?;
+                                .await?; // torrent data was moved on commit; there's no sense in keeping it
                             log::debug!("torrent `{i}` resolved.")
                         }
                         Ok(_) => panic!(),

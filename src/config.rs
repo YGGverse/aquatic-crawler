@@ -6,6 +6,12 @@ use url::Url;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Config {
+    /// Directory path to store preloaded data (e.g. `.torrent` files)
+    ///
+    /// * it's probably the same location as `public` dir for the [btracker](https://github.com/YGGverse/btracker) frontend
+    #[arg(long)]
+    pub preload: PathBuf,
+
     /// Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API
     ///
     /// * PR#233 feature ([Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic))
@@ -46,10 +52,6 @@ pub struct Config {
     #[arg(long)]
     pub bind: Option<String>,
 
-    /// Directory path to store preloaded data (e.g. `.torrent` files)
-    #[arg(long)]
-    pub preload: PathBuf,
-
     /// Preload only files match regex pattern (list only without preload by default)
     /// * see also `preload_max_filesize`, `preload_max_filecount` options
     ///
@@ -76,7 +78,7 @@ pub struct Config {
     #[arg(long)]
     pub proxy_url: Option<Url>,
 
-    // Peer options
+    // Tuneup the peers processor
     #[arg(long)]
     pub peer_connect_timeout: Option<u64>,
 
@@ -87,6 +89,8 @@ pub struct Config {
     pub peer_keep_alive_interval: Option<u64>,
 
     /// Estimated info-hash index capacity
+    ///
+    /// * use for memory optimization, depending on tracker volumes
     #[arg(long, default_value_t = 1000)]
     pub index_capacity: usize,
 
@@ -100,7 +104,7 @@ pub struct Config {
 
     /// Limit download speed (b/s)
     #[arg(long)]
-    pub download_limit: Option<u32>,
+    pub download_limit: Option<u32>, // * reminder: upload feature is not planed by the crawler impl
 
     /// Skip long-thinking connections,
     /// try to handle the other hashes in this queue after `n` seconds
