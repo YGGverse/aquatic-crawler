@@ -184,7 +184,17 @@ async fn main() -> Result<()> {
                             session.unpause(&mt).await?;
                             log::debug!("begin torrent `{i}` preload...");
                             // await for `preload_regex` files download to continue
-                            mt.wait_until_completed().await?;
+                            if let Err(e) = time::timeout(
+                                Duration::from_secs(config.wait_until_completed),
+                                mt.wait_until_completed(),
+                            )
+                            .await
+                            {
+                                log::debug!(
+                                    "skip awaiting the completion of preload `{i}` data (`{e}`)"
+                                );
+                                continue;
+                            }
                             log::debug!("torrent `{i}` preload completed.");
                             // persist torrent bytes and preloaded content,
                             // cleanup tmp (see rqbit#408)

@@ -120,4 +120,9 @@ pub struct Config {
     /// Limit download speed (b/s)
     #[arg(long)]
     pub download_limit: Option<u32>,
+
+    /// Skip long-thinking connections,
+    /// try to handle the other hashes in this queue after `n` seconds
+    #[arg(long, default_value_t = 10)]
+    pub wait_until_completed: u64,
 }
