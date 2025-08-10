@@ -192,6 +192,9 @@ async fn main() -> Result<()> {
                                 log::debug!(
                                     "skip awaiting the completion of preload `{i}` data (`{e}`)"
                                 );
+                                session
+                                    .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
+                                    .await?; // managed torrent is not managed in this queue anymore
                                 continue;
                             }
                             log::debug!("torrent `{i}` preload completed.");
