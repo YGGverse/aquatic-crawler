@@ -211,9 +211,11 @@ async fn main() -> Result<()> {
                             log::debug!("torrent `{i}` resolved.")
                         }
                         Ok(_) => panic!(),
-                        Err(e) => log::debug!("failed to resolve `{i}`: `{e}`."),
+                        Err(e) => log::debug!("failed to resolve torrent `{i}`: `{e}`."),
                     },
-                    Err(e) => log::debug!("failed to resolve `{i}`: `{e}`"),
+                    Err(e) => log::debug!(
+                        "skip awaiting the completion of adding torrent `{i}` data (`{e}`)"
+                    ),
                 }
             }
         }
