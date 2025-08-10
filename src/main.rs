@@ -5,8 +5,8 @@ mod preload;
 use anyhow::Result;
 use config::Config;
 use librqbit::{
-    AddTorrent, AddTorrentOptions, AddTorrentResponse, ConnectionOptions, ListenerOptions,
-    PeerConnectionOptions, SessionOptions,
+    AddTorrent, AddTorrentOptions, AddTorrentResponse, ConnectionOptions, PeerConnectionOptions,
+    SessionOptions,
 };
 use preload::Preload;
 use std::{collections::HashSet, num::NonZero, time::Duration};
@@ -35,19 +35,7 @@ async fn main() -> Result<()> {
         SessionOptions {
             bind_device_name: config.bind,
             blocklist_url: config.blocklist.map(|b| b.into()),
-            listen: match config.listen {
-                Some(listen_addr) => Some(ListenerOptions {
-                    enable_upnp_port_forwarding: config.listen_upnp,
-                    listen_addr,
-                    ..ListenerOptions::default()
-                }),
-                None => {
-                    if config.listen_upnp {
-                        panic!("`--listen` argument is required!")
-                    }
-                    None
-                }
-            },
+            listen: None,
             connect: Some(ConnectionOptions {
                 enable_tcp: !config.disable_tcp,
                 proxy_url: config.proxy_url.map(|u| u.to_string()),
@@ -60,11 +48,11 @@ async fn main() -> Result<()> {
             disable_dht_persistence: true,
             disable_dht: !config.enable_dht,
             disable_local_service_discovery: !config.enable_lsd,
-            disable_upload: !config.enable_upload,
+            disable_upload: true,
             persistence: None,
             ratelimits: librqbit::limits::LimitsConfig {
-                upload_bps: config.upload_limit.and_then(NonZero::new),
                 download_bps: config.download_limit.and_then(NonZero::new),
+                ..librqbit::limits::LimitsConfig::default()
             },
             trackers: config.tracker.iter().cloned().collect(),
             ..SessionOptions::default()
@@ -191,13 +179,9 @@ async fn main() -> Result<()> {
                                 log::debug!(
                                     "skip awaiting the completion of preload `{i}` data (`{e}`)"
                                 );
-                                if config.enable_upload {
-                                    todo!()
-                                } else {
-                                    session
-                                        .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
-                                        .await?
-                                }
+                                session
+                                    .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
+                                    .await?;
                                 continue;
                             }
                             log::debug!("torrent `{i}` preload completed.");
@@ -208,22 +192,12 @@ async fn main() -> Result<()> {
                                 keep_files.len()
                             );
                             preload.commit(&i, bytes, Some(keep_files))?;
-                            if !config.enable_upload {
-                                session
-                                    .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
-                                    .await?
-                            }
+                            session
+                                .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
+                                .await?;
                             log::debug!("torrent `{i}` resolved.")
                         }
-                        Ok(AddTorrentResponse::AlreadyManaged(..)) => {
-                            if config.enable_upload {
-                                todo!()
-                                //log::debug!("keep sharing the existing torrent data for `{i}`.")
-                            } else {
-                                panic!("torrent `{i}` was not removed properly!")
-                            }
-                        }
-                        Ok(_) => panic!("list only mode is not expected by the implementation!"),
+                        Ok(_) => panic!(),
                         Err(e) => log::debug!("failed to resolve torrent `{i}`: `{e}`."),
                     },
                     Err(e) => log::debug!(

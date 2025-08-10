@@ -46,21 +46,6 @@ pub struct Config {
     #[arg(long)]
     pub bind: Option<String>,
 
-    /// Bind listener on specified `host:port` (`[host]:port` for IPv6)
-    ///
-    /// * this option is useful only for binding the data exchange service,
-    ///   to restrict the outgoing connections for torrent resolver, use `bind` option instead
-    #[arg(long)]
-    pub listen: Option<SocketAddr>,
-
-    /// Enable UPnP forwarding
-    #[arg(long, default_value_t = false)]
-    pub listen_upnp: bool,
-
-    /// Enable upload (share bytes received with BitTorrent network)
-    #[arg(long, default_value_t = false)]
-    pub enable_upload: bool,
-
     /// Directory path to store preloaded data (e.g. `.torrent` files)
     #[arg(long)]
     pub preload: PathBuf,
@@ -112,10 +97,6 @@ pub struct Config {
     /// Crawl loop delay in seconds
     #[arg(long, default_value_t = 300)]
     pub sleep: u64,
-
-    /// Limit upload speed (b/s)
-    #[arg(long)]
-    pub upload_limit: Option<u32>,
 
     /// Limit download speed (b/s)
     #[arg(long)]
