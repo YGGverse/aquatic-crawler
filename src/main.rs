@@ -191,7 +191,9 @@ async fn main() -> Result<()> {
                                 log::debug!(
                                     "skip awaiting the completion of preload `{i}` data (`{e}`)"
                                 );
-                                if !config.enable_upload {
+                                if config.enable_upload {
+                                    todo!()
+                                } else {
                                     session
                                         .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                         .await?;
@@ -206,7 +208,9 @@ async fn main() -> Result<()> {
                                 keep_files.len()
                             );
                             preload.commit(&i, bytes, Some(keep_files))?;
-                            if !config.enable_upload {
+                            if config.enable_upload {
+                                todo!()
+                            } else {
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                     .await?
