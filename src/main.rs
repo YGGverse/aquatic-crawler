@@ -208,9 +208,7 @@ async fn main() -> Result<()> {
                                 keep_files.len()
                             );
                             preload.commit(&i, bytes, Some(keep_files))?;
-                            if config.enable_upload {
-                                todo!()
-                            } else {
+                            if !config.enable_upload {
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                     .await?
