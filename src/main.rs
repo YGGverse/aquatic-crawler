@@ -134,7 +134,6 @@ async fn main() -> Result<()> {
                 .await
                 {
                     Ok(r) => match r {
-                        // on `preload_regex` case only
                         Ok(AddTorrentResponse::Added(id, mt)) => {
                             let mut keep_files = HashSet::with_capacity(
                                 config.preload_max_filecount.unwrap_or_default(),
@@ -192,9 +191,11 @@ async fn main() -> Result<()> {
                                 log::debug!(
                                     "skip awaiting the completion of preload `{i}` data (`{e}`)"
                                 );
-                                session
-                                    .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
-                                    .await?; // managed torrent is not managed in this queue anymore
+                                if !config.enable_upload {
+                                    session
+                                        .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
+                                        .await?;
+                                }
                                 continue;
                             }
                             log::debug!("torrent `{i}` preload completed.");
@@ -205,7 +206,6 @@ async fn main() -> Result<()> {
                                 keep_files.len()
                             );
                             preload.commit(&i, bytes, Some(keep_files))?;
-                            // remove torrent from the session as indexed
                             if !config.enable_upload {
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
@@ -213,7 +213,14 @@ async fn main() -> Result<()> {
                             }
                             log::debug!("torrent `{i}` resolved.")
                         }
-                        Ok(_) => panic!(),
+                        Ok(AddTorrentResponse::AlreadyManaged(..)) => {
+                            if config.enable_upload {
+                                log::debug!("keep sharing the existing torrent data for `{i}`.")
+                            } else {
+                                panic!("torrent `{i}` was not removed properly!")
+                            }
+                        }
+                        Ok(_) => panic!("list only mode is not expected by the implementation!"),
                         Err(e) => log::debug!("failed to resolve torrent `{i}`: `{e}`."),
                     },
                     Err(e) => log::debug!(
@@ -236,7 +243,7 @@ async fn main() -> Result<()> {
     }
 }
 
-/// Build magnet URI
+/// Build magnet URI (`librqbit` impl dependency)
 fn magnet(info_hash: &str, trackers: Option<&Vec<Url>>) -> String {
     let mut m = format!("magnet:?xt=urn:btih:{info_hash}");
     if let Some(t) = trackers {
