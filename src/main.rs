@@ -80,7 +80,10 @@ async fn main() -> Result<()> {
             // grab latest info-hashes from this source
             // * aquatic server may update the stats at this moment, handle result manually
             for i in match api::get(source, config.index_capacity) {
-                Some(i) => i,
+                Some(i) => {
+                    log::debug!("fetch `{}` hashes from `{source}`...", i.len());
+                    i
+                }
                 None => {
                     // skip without panic
                     log::warn!(
