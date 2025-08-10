@@ -183,7 +183,6 @@ async fn main() -> Result<()> {
                             session.update_only_files(&mt, &only_files).await?;
                             session.unpause(&mt).await?;
                             log::debug!("begin torrent `{i}` preload...");
-                            // await for `preload_regex` files download to continue
                             if let Err(e) = time::timeout(
                                 Duration::from_secs(config.wait_until_completed),
                                 mt.wait_until_completed(),
