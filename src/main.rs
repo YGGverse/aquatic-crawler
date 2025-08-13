@@ -74,7 +74,7 @@ async fn main() -> Result<()> {
             let is_expired = v > Utc::now() - Duration::from_secs(config.ban);
             if is_expired {
                 log::debug!(
-                    "remove `{}` from the ban list (timeout expired)",
+                    "remove `{}` from the ban list by timeout expire ({v})",
                     k.as_string()
                 )
             }
