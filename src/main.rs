@@ -6,8 +6,7 @@ use anyhow::Result;
 use chrono::DateTime;
 use config::Config;
 use librqbit::{
-    AddTorrent, AddTorrentOptions, AddTorrentResponse, ConnectionOptions, PeerConnectionOptions,
-    SessionOptions,
+    AddTorrent, AddTorrentOptions, AddTorrentResponse, ConnectionOptions, SessionOptions,
 };
 use preload::Preload;
 use std::{
@@ -44,11 +43,7 @@ async fn main() -> Result<()> {
             connect: Some(ConnectionOptions {
                 enable_tcp: !config.disable_tcp,
                 proxy_url: config.proxy_url.map(|u| u.to_string()),
-                peer_opts: Some(PeerConnectionOptions {
-                    connect_timeout: config.peer_connect_timeout.map(Duration::from_secs),
-                    read_write_timeout: config.peer_read_write_timeout.map(Duration::from_secs),
-                    keep_alive_interval: config.peer_keep_alive_interval.map(Duration::from_secs),
-                }),
+                ..ConnectionOptions::default()
             }),
             disable_dht_persistence: true,
             disable_dht: !config.enable_dht,
@@ -112,7 +107,7 @@ async fn main() -> Result<()> {
                 // run the crawler in single thread for performance reasons,
                 // use `timeout` argument option to skip the dead connections.
                 match time::timeout(
-                    Duration::from_secs(config.add_torrent_timeout),
+                    Duration::from_secs(config.timeout),
                     session.add_torrent(
                         AddTorrent::from_url(magnet(
                             &h,
@@ -194,28 +189,20 @@ async fn main() -> Result<()> {
                             session.unpause(&mt).await?;
                             log::debug!("begin torrent `{h}` preload...");
                             if let Err(e) = time::timeout(
-                                Duration::from_secs(config.wait_until_completed),
+                                Duration::from_secs(config.timeout),
                                 mt.wait_until_completed(),
                             )
                             .await
                             {
+                                let t = Local::now()
+                                    + Duration::from_secs(ban.len() as u64 * config.timeout);
+                                log::debug!(
+                                    "skip awaiting the completion of preload `{h}` data (`{e}`), ban until {t}."
+                                );
+                                assert!(ban.insert(i, t).is_none());
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                     .await?; // * do not collect billions of slow torrents in the session pool
-                                if let Some(wait_until_completed_ban) =
-                                    config.wait_until_completed_ban
-                                {
-                                    let t = Local::now()
-                                        + Duration::from_secs(wait_until_completed_ban);
-                                    log::debug!(
-                                        "skip awaiting the completion of preload `{h}` data (`{e}`), ban until {t}."
-                                    );
-                                    assert!(ban.insert(i, t).is_none())
-                                } else {
-                                    log::debug!(
-                                        "skip awaiting the completion of preload `{h}` data (`{e}`)"
-                                    )
-                                }
                                 continue;
                             }
                             log::debug!("torrent `{h}` preload completed.");
@@ -233,13 +220,15 @@ async fn main() -> Result<()> {
                         }
                         Ok(_) => panic!(),
                         Err(e) => {
-                            let t = Local::now() + Duration::from_secs(config.resolve_torrent_ban);
+                            let t = Local::now()
+                                + Duration::from_secs(ban.len() as u64 * config.timeout);
                             log::debug!("failed to resolve torrent `{h}`: `{e}`, ban until {t}.");
                             assert!(ban.insert(i, t).is_none())
                         }
                     },
                     Err(e) => {
-                        let t = Local::now() + Duration::from_secs(config.add_torrent_ban);
+                        let t =
+                            Local::now() + Duration::from_secs(ban.len() as u64 * config.timeout);
                         log::debug!(
                             "skip awaiting the completion of adding torrent `{h}` data (`{e}`), ban until {t}."
                         );

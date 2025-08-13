@@ -74,19 +74,13 @@ pub struct Config {
     #[arg(long)]
     pub preload_max_filecount: Option<usize>,
 
+    /// Limit download speed (b/s)
+    #[arg(long)]
+    pub download_limit: Option<u32>, // * reminder: upload feature is not planed by the crawler impl
+
     /// Use `socks5://[username:password@]host:port`
     #[arg(long)]
     pub proxy_url: Option<Url>,
-
-    // Tuneup the peers processor
-    #[arg(long)]
-    pub peer_connect_timeout: Option<u64>,
-
-    #[arg(long)]
-    pub peer_read_write_timeout: Option<u64>,
-
-    #[arg(long)]
-    pub peer_keep_alive_interval: Option<u64>,
 
     /// Estimated info-hash index capacity
     ///
@@ -94,32 +88,14 @@ pub struct Config {
     #[arg(long, default_value_t = 1000)]
     pub index_capacity: usize,
 
-    /// Max time in seconds to add new torrent
-    #[arg(long, default_value_t = 60)]
-    pub add_torrent_timeout: u64,
-
-    /// Ban time in seconds on torrent add failure (`add_torrent_timeout` is reached)
-    #[arg(long, default_value_t = 3600)]
-    pub add_torrent_ban: u64,
-
-    /// Ban time in seconds on torrent resolve failure
-    #[arg(long, default_value_t = 3600)]
-    pub resolve_torrent_ban: u64,
-
     /// Crawl loop delay in seconds
     #[arg(long, default_value_t = 60)]
     pub sleep: u64,
 
-    /// Limit download speed (b/s)
-    #[arg(long)]
-    pub download_limit: Option<u32>, // * reminder: upload feature is not planed by the crawler impl
-
-    /// Skip long-thinking connections,
-    /// try to handle the other hashes in this queue after `n` seconds
+    /// Skip and ban slow or unresolvable hashes
+    /// when the specified value in seconds is reached
+    ///
+    /// * the ban time is dynamically calculated based on the current ban list collected
     #[arg(long, default_value_t = 60)]
-    pub wait_until_completed: u64,
-
-    /// Ban time in seconds on torrent data download is longer than `wait_until_completed`
-    #[arg(long)]
-    pub wait_until_completed_ban: Option<u64>,
+    pub timeout: u64,
 }
