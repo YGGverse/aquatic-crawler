@@ -209,11 +209,11 @@ async fn main() -> Result<()> {
                                     log::debug!(
                                         "skip awaiting the completion of preload `{h}` data (`{e}`), ban until {t}."
                                     );
-                                    assert!(ban.insert(i, t).is_none());
+                                    assert!(ban.insert(i, t).is_none())
                                 } else {
                                     log::debug!(
                                         "skip awaiting the completion of preload `{h}` data (`{e}`)"
-                                    );
+                                    )
                                 }
                                 continue;
                             }
@@ -234,7 +234,7 @@ async fn main() -> Result<()> {
                         Err(e) => {
                             let t = Local::now() + Duration::from_secs(config.add_torrent_ban);
                             log::debug!("failed to resolve torrent `{h}`: `{e}`, ban until {t}.");
-                            assert!(ban.insert(i, t).is_none());
+                            assert!(ban.insert(i, t).is_none())
                         }
                     },
                     Err(e) => {
@@ -242,7 +242,7 @@ async fn main() -> Result<()> {
                         log::debug!(
                             "skip awaiting the completion of adding torrent `{h}` data (`{e}`), ban until {t}."
                         );
-                        assert!(ban.insert(i, t).is_none());
+                        assert!(ban.insert(i, t).is_none())
                     }
                 }
             }
