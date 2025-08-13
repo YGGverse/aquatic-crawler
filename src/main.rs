@@ -64,7 +64,8 @@ async fn main() -> Result<()> {
         },
     )
     .await?;
-    let mut ban: HashMap<String, DateTime<Utc>> = HashMap::with_capacity(config.index_capacity);
+    let mut ban: HashMap<librqbit::dht::Id20, DateTime<Utc>> =
+        HashMap::with_capacity(config.index_capacity);
     log::info!("crawler started at {time_init}");
     loop {
         let time_queue = Local::now();
@@ -72,7 +73,10 @@ async fn main() -> Result<()> {
         ban.retain(|k, &mut v| {
             let is_expired = v > Utc::now() - Duration::from_secs(config.ban);
             if is_expired {
-                log::debug!("remove `{k}` from the ban list (timeout expired)")
+                log::debug!(
+                    "remove `{}` from the ban list (timeout expired)",
+                    k.as_string()
+                )
             }
             is_expired
         });
@@ -99,7 +103,7 @@ async fn main() -> Result<()> {
                     log::debug!("torrent `{h}` exists and already indexed, skip.");
                     continue;
                 }
-                if ban.contains_key(&h) {
+                if ban.contains_key(&i) {
                     log::debug!("torrent `{h}` is temporary banned, skip for this queue.");
                     continue;
                 }
@@ -197,7 +201,7 @@ async fn main() -> Result<()> {
                                 log::debug!(
                                     "skip awaiting the completion of preload `{h}` data (`{e}`)"
                                 );
-                                ban.insert(h, Utc::now());
+                                ban.insert(i, Utc::now());
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                     .await?; // * do not collect billions of slow torrents in the session pool
@@ -219,14 +223,14 @@ async fn main() -> Result<()> {
                         Ok(_) => panic!(),
                         Err(e) => {
                             log::debug!("failed to resolve torrent `{h}`: `{e}`.");
-                            assert!(ban.insert(h, Utc::now()).is_none());
+                            assert!(ban.insert(i, Utc::now()).is_none());
                         }
                     },
                     Err(e) => {
                         log::debug!(
                             "skip awaiting the completion of adding torrent `{h}` data (`{e}`)"
                         );
-                        assert!(ban.insert(h, Utc::now()).is_none());
+                        assert!(ban.insert(i, Utc::now()).is_none());
                     }
                 }
             }
