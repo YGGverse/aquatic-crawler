@@ -47,7 +47,11 @@ impl Ban {
 
     /// * return expiration time
     pub fn add(&mut self, key: Id20) -> DateTime<Local> {
-        let t = self.index.values().max().map_or(Local::now(), |t| *t) + self.timeout;
+        let t = self
+            .index
+            .values()
+            .max()
+            .map_or(Local::now(), |t| *t + self.timeout);
         assert!(self.index.insert(key, t).is_none());
         t
     }
