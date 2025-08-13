@@ -63,7 +63,7 @@ async fn main() -> Result<()> {
         log::debug!("queue crawl begin at {time_queue}...");
         for r in ban.update(time_queue) {
             log::debug!(
-                "remove the ban for `{}` as it has expired on {}",
+                "remove ban for `{}` as expired on {}",
                 r.info_hash,
                 r.expires
             )
