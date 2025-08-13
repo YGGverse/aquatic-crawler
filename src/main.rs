@@ -100,7 +100,7 @@ async fn main() -> Result<()> {
                 // convert to string once
                 let h = i.as_string();
                 if preload.contains_torrent(&h)? {
-                    log::debug!("torrent `{h}` exists and already indexed, skip.");
+                    log::debug!("torrent `{h}` exists, skip.");
                     continue;
                 }
                 if ban.contains_key(&i) {
