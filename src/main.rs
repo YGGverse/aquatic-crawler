@@ -198,12 +198,20 @@ async fn main() -> Result<()> {
                             )
                             .await
                             {
-                                log::debug!(
-                                    "skip awaiting the completion of preload `{h}` data (`{e}`)"
-                                );
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                     .await?; // * do not collect billions of slow torrents in the session pool
+                                if let Some(slow_torrent_ban) = config.slow_torrent_ban {
+                                    let t = Local::now() + Duration::from_secs(slow_torrent_ban);
+                                    log::debug!(
+                                        "skip awaiting the completion of preload `{h}` data (`{e}`), ban until {t}."
+                                    );
+                                    assert!(ban.insert(i, t).is_none());
+                                } else {
+                                    log::debug!(
+                                        "skip awaiting the completion of preload `{h}` data (`{e}`)"
+                                    );
+                                }
                                 continue;
                             }
                             log::debug!("torrent `{h}` preload completed.");
