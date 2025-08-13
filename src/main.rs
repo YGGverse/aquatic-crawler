@@ -232,7 +232,7 @@ async fn main() -> Result<()> {
             }
         }
         log::debug!(
-            "queue completed at {time_queue} (time: {} / uptime: {} / banned: {})",
+            "queue completed at {time_queue} (time: {} / uptime: {} / banned: {}) await {} seconds to continue...",
             Local::now()
                 .signed_duration_since(time_queue)
                 .as_seconds_f32(),
@@ -240,11 +240,9 @@ async fn main() -> Result<()> {
                 .signed_duration_since(time_init)
                 .as_seconds_f32(),
             ban.len(),
+            config.sleep
         );
-        if let Some(sleep) = config.sleep {
-            log::debug!("await {sleep} seconds to continue...");
-            std::thread::sleep(Duration::from_secs(sleep))
-        }
+        std::thread::sleep(Duration::from_secs(config.sleep))
     }
 }
 
