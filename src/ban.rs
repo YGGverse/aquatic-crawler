@@ -9,14 +9,14 @@ pub struct Item {
 
 pub struct Ban {
     index: HashMap<Id20, DateTime<Local>>,
-    timeout: u64,
+    timeout: Duration,
 }
 
 impl Ban {
     pub fn init(timeout: u64, capacity: usize) -> Self {
         Self {
             index: HashMap::with_capacity(capacity),
-            timeout,
+            timeout: Duration::from_secs(timeout),
         }
     }
 
@@ -28,7 +28,7 @@ impl Ban {
         self.index.len()
     }
 
-    /// * returns removed `Item` details
+    /// * return removed `Item` details
     pub fn update(&mut self, time: DateTime<Local>) -> Vec<Item> {
         let mut b = Vec::with_capacity(self.index.len());
         self.index.retain(|i, &mut expires| {
@@ -45,9 +45,9 @@ impl Ban {
         b
     }
 
-    /// * returns expiration time
+    /// * return expiration time
     pub fn add(&mut self, key: Id20) -> DateTime<Local> {
-        let t = Local::now() + Duration::from_secs(self.index.len() as u64 * self.timeout);
+        let t = self.index.values().max().map_or(Local::now(), |t| *t) + self.timeout;
         assert!(self.index.insert(key, t).is_none());
         t
     }
