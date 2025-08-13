@@ -20,8 +20,8 @@ impl Ban {
         }
     }
 
-    pub fn has(&self, key: &Id20) -> bool {
-        self.index.contains_key(key)
+    pub fn get(&self, key: &Id20) -> Option<&DateTime<Local>> {
+        self.index.get(key)
     }
 
     pub fn total(&self) -> usize {

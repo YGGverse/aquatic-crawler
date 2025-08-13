@@ -91,8 +91,8 @@ async fn main() -> Result<()> {
                     log::debug!("torrent `{h}` exists, skip.");
                     continue;
                 }
-                if ban.has(&i) {
-                    log::debug!("torrent `{h}` is temporary banned, skip for this queue.");
+                if let Some(t) = ban.get(&i) {
+                    log::debug!("torrent `{h}` is banned until {t}, skip for this queue.");
                     continue;
                 }
                 log::debug!("index `{h}`...");
