@@ -61,7 +61,13 @@ async fn main() -> Result<()> {
     loop {
         let time_queue = Local::now();
         log::debug!("queue crawl begin at {time_queue}...");
-        ban.update(time_queue);
+        for r in ban.update(time_queue) {
+            log::debug!(
+                "remove the ban for `{}` as it has expired on {}",
+                r.info_hash,
+                r.expires
+            )
+        }
         for source in &config.infohash {
             log::debug!("index source `{source}`...");
             // grab latest info-hashes from this source
