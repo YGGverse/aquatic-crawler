@@ -99,7 +99,7 @@ pub struct Config {
     pub add_torrent_timeout: u64,
 
     /// Crawl loop delay in seconds
-    #[arg(long, default_value_t = 900)]
+    #[arg(long, default_value_t = 60)]
     pub sleep: u64,
 
     /// Ban unresolvable info-hashes for `n` seconds
