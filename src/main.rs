@@ -74,7 +74,7 @@ async fn main() -> Result<()> {
             let is_expired = t > time_queue - Duration::from_secs(config.ban);
             if is_expired {
                 log::debug!(
-                    "remove `{}` from the ban list by timeout expire ({t})",
+                    "remove ban for `{}` by the timeout expiration ({t})",
                     i.as_string()
                 )
             }
@@ -221,13 +221,17 @@ async fn main() -> Result<()> {
                         }
                         Ok(_) => panic!(),
                         Err(e) => {
-                            log::debug!("failed to resolve torrent `{h}`: `{e}`.");
+                            log::debug!(
+                                "failed to resolve torrent `{h}`: `{e}`, ban for {} seconds.",
+                                config.ban
+                            );
                             assert!(ban.insert(i, Local::now()).is_none());
                         }
                     },
                     Err(e) => {
                         log::debug!(
-                            "skip awaiting the completion of adding torrent `{h}` data (`{e}`)"
+                            "skip awaiting the completion of adding torrent `{h}` data (`{e}`), ban for {} seconds.",
+                            config.ban
                         );
                         assert!(ban.insert(i, Local::now()).is_none());
                     }
