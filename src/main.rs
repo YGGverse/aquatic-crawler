@@ -70,12 +70,12 @@ async fn main() -> Result<()> {
     loop {
         let time_queue = Local::now();
         log::debug!("queue crawl begin at {time_queue}...");
-        ban.retain(|k, &mut v| {
-            let is_expired = v > time_queue - Duration::from_secs(config.ban);
+        ban.retain(|i, &mut t| {
+            let is_expired = t > time_queue - Duration::from_secs(config.ban);
             if is_expired {
                 log::debug!(
-                    "remove `{}` from the ban list by timeout expire ({v})",
-                    k.as_string()
+                    "remove `{}` from the ban list by timeout expire ({t})",
+                    i.as_string()
                 )
             }
             is_expired
