@@ -201,8 +201,11 @@ async fn main() -> Result<()> {
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                     .await?; // * do not collect billions of slow torrents in the session pool
-                                if let Some(slow_torrent_ban) = config.slow_torrent_ban {
-                                    let t = Local::now() + Duration::from_secs(slow_torrent_ban);
+                                if let Some(wait_until_completed_ban) =
+                                    config.wait_until_completed_ban
+                                {
+                                    let t = Local::now()
+                                        + Duration::from_secs(wait_until_completed_ban);
                                     log::debug!(
                                         "skip awaiting the completion of preload `{h}` data (`{e}`), ban until {t}."
                                     );

@@ -106,10 +106,6 @@ pub struct Config {
     #[arg(long, default_value_t = 3600)]
     pub resolve_torrent_ban: u64,
 
-    /// Ban time in seconds on torrent data download is longer than `wait_until_completed`
-    #[arg(long)]
-    pub slow_torrent_ban: Option<u64>,
-
     /// Crawl loop delay in seconds
     #[arg(long, default_value_t = 60)]
     pub sleep: u64,
@@ -122,4 +118,8 @@ pub struct Config {
     /// try to handle the other hashes in this queue after `n` seconds
     #[arg(long, default_value_t = 60)]
     pub wait_until_completed: u64,
+
+    /// Ban time in seconds on torrent data download is longer than `wait_until_completed`
+    #[arg(long)]
+    pub wait_until_completed_ban: Option<u64>,
 }
