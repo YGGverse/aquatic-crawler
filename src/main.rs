@@ -180,13 +180,13 @@ async fn main() -> Result<()> {
                             )
                             .await
                             {
-                                session
-                                    .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
-                                    .await?; // * do not collect billions of slow torrents in the session pool
                                 log::debug!(
                                     "skip awaiting the completion of preload `{h}` data (`{e}`), ban until {}.",
                                     ban.add(i)
                                 );
+                                session
+                                    .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
+                                    .await?; // * do not collect billions of slow torrents in the session pool
                                 continue;
                             }
                             log::debug!("torrent `{h}` preload completed.");
