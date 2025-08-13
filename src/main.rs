@@ -71,7 +71,7 @@ async fn main() -> Result<()> {
         let time_queue = Local::now();
         log::debug!("queue crawl begin at {time_queue}...");
         ban.retain(|i, &mut t| {
-            let is_expired = t > time_queue - Duration::from_secs(config.ban);
+            let is_expired = t >= time_queue;
             if is_expired {
                 log::debug!(
                     "remove ban for `{}` by the timeout expiration ({t})",
@@ -221,19 +221,17 @@ async fn main() -> Result<()> {
                         }
                         Ok(_) => panic!(),
                         Err(e) => {
-                            log::debug!(
-                                "failed to resolve torrent `{h}`: `{e}`, ban for {} seconds.",
-                                config.ban
-                            );
-                            assert!(ban.insert(i, Local::now()).is_none());
+                            let t = Local::now() + Duration::from_secs(config.add_torrent_ban);
+                            log::debug!("failed to resolve torrent `{h}`: `{e}`, ban until {t}.");
+                            assert!(ban.insert(i, t).is_none());
                         }
                     },
                     Err(e) => {
+                        let t = Local::now() + Duration::from_secs(config.add_torrent_ban);
                         log::debug!(
-                            "skip awaiting the completion of adding torrent `{h}` data (`{e}`), ban for {} seconds.",
-                            config.ban
+                            "skip awaiting the completion of adding torrent `{h}` data (`{e}`), ban until {t}."
                         );
-                        assert!(ban.insert(i, Local::now()).is_none());
+                        assert!(ban.insert(i, t).is_none());
                     }
                 }
             }

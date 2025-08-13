@@ -94,17 +94,21 @@ pub struct Config {
     #[arg(long, default_value_t = 1000)]
     pub index_capacity: usize,
 
-    /// Max time to handle each torrent
+    /// Max time in seconds to add new torrent
     #[arg(long, default_value_t = 60)]
     pub add_torrent_timeout: u64,
+
+    /// Ban time in seconds on torrent add failure
+    #[arg(long, default_value_t = 3600)]
+    pub add_torrent_ban: u64,
+
+    /// Ban time in seconds on torrent resolve failure
+    #[arg(long, default_value_t = 3600)]
+    pub resolve_torrent_ban: u64,
 
     /// Crawl loop delay in seconds
     #[arg(long, default_value_t = 60)]
     pub sleep: u64,
-
-    /// Ban unresolvable info-hashes for `n` seconds
-    #[arg(long, default_value_t = 3600)]
-    pub ban: u64,
 
     /// Limit download speed (b/s)
     #[arg(long)]
