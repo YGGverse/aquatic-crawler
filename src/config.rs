@@ -106,7 +106,7 @@ pub struct Config {
     #[arg(long, default_value_t = 3600)]
     pub resolve_torrent_ban: u64,
 
-    /// Ban time in seconds on torrent data download is longer than `add_torrent_timeout`
+    /// Ban time in seconds on torrent data download is longer than `wait_until_completed`
     #[arg(long)]
     pub slow_torrent_ban: Option<u64>,
 
