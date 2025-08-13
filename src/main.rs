@@ -70,15 +70,16 @@ async fn main() -> Result<()> {
     loop {
         let time_queue = Local::now();
         log::debug!("queue crawl begin at {time_queue}...");
-        ban.retain(|i, &mut t| {
-            let is_expired = t >= time_queue;
-            if is_expired {
+        ban.retain(|i, &mut expires| {
+            if time_queue > expires {
                 log::debug!(
-                    "remove ban for `{}` by the timeout expiration ({t})",
+                    "remove ban for `{}` by the timeout expiration ({expires})",
                     i.as_string()
-                )
+                );
+                false
+            } else {
+                true
             }
-            is_expired
         });
         for source in &config.infohash {
             log::debug!("index source `{source}`...");
