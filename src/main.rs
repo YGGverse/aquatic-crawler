@@ -201,7 +201,6 @@ async fn main() -> Result<()> {
                                 log::debug!(
                                     "skip awaiting the completion of preload `{h}` data (`{e}`)"
                                 );
-                                ban.insert(i, Local::now());
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                     .await?; // * do not collect billions of slow torrents in the session pool
