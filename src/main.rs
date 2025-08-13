@@ -233,7 +233,7 @@ async fn main() -> Result<()> {
                         }
                         Ok(_) => panic!(),
                         Err(e) => {
-                            let t = Local::now() + Duration::from_secs(config.add_torrent_ban);
+                            let t = Local::now() + Duration::from_secs(config.resolve_torrent_ban);
                             log::debug!("failed to resolve torrent `{h}`: `{e}`, ban until {t}.");
                             assert!(ban.insert(i, t).is_none())
                         }
