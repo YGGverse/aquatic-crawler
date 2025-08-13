@@ -28,6 +28,7 @@ impl Ban {
         self.index.len()
     }
 
+    /// * returns removed `Item` details
     pub fn update(&mut self, time: DateTime<Local>) -> Vec<Item> {
         let mut b = Vec::with_capacity(self.index.len());
         self.index.retain(|i, &mut expires| {
