@@ -34,6 +34,7 @@ torrent client               <-----------------------|          * /preload/info-
 > [!TIP]
 > * prepend `RUST_LOG=debug` to debug, append `NO_COLOR=1` to disable fmt
 > * use `--preload-*` arguments group to avoid preloading everything (by default)
+> * make sure the current `nofile` value corresponds to the expected count of torrent files ([details](https://github.com/YGGverse/aquatic-crawler/wiki/Troubleshooting))!
 
 ``` bash
 aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
