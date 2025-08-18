@@ -129,6 +129,7 @@ async fn main() -> Result<()> {
                 {
                     Ok(r) => match r {
                         Ok(AddTorrentResponse::Added(id, mt)) => {
+                            assert!(mt.is_paused());
                             let mut keep_files = HashSet::with_capacity(
                                 config.preload_max_filecount.unwrap_or_default(),
                             );
