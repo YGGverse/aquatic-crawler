@@ -90,6 +90,12 @@ async fn main() -> Result<()> {
         }
 
         // handle
+        log::debug!(
+            "fetched {} unique hashes from {} source, banned: {}.",
+            queue.len(),
+            config.infohash.len(),
+            ban.len()
+        );
         for i in queue {
             // convert to string once
             let h = i.as_string();
