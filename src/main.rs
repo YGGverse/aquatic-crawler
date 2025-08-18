@@ -190,7 +190,7 @@ async fn main() -> Result<()> {
                             .await
                             {
                                 log::info!(
-                                    "skip awaiting the completion of preload `{h}` data (`{e}`), ban {}.",
+                                    "skip awaiting the completion of preload torrent data for `{h}` (`{e}`), ban {}.",
                                     match ban.add(i, false) {
                                         Some(t) => format!("until {t}"),
                                         None => "permanently".into(), // @TODO feature, do not unwrap
@@ -224,7 +224,7 @@ async fn main() -> Result<()> {
                         ),
                     },
                     Err(e) => log::info!(
-                        "skip awaiting the completion of adding torrent `{h}` data (`{e}`), ban {}.",
+                        "skip awaiting the completion of adding torrent `{h}` (`{e}`), ban {}.",
                         match ban.add(i, false) {
                             Some(t) => format!("until {t}"),
                             None => "permanently".into(), // @TODO feature, do not unwrap
