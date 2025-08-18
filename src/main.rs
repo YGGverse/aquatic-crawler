@@ -110,15 +110,11 @@ async fn main() -> Result<()> {
                             },
                         )),
                         Some(AddTorrentOptions {
-                            paused: true, // continue after `only_files` init
+                            paused: true, // continue after `only_files` update
                             overwrite: true,
                             disable_trackers: config.tracker.is_empty(),
                             initial_peers: config.initial_peer.clone(),
                             list_only: false,
-                            // it is important to blacklist all files preload until initiation
-                            only_files: Some(Vec::with_capacity(
-                                config.preload_max_filecount.unwrap_or_default(),
-                            )),
                             // the destination folder to preload files match `preload_regex`
                             // * e.g. images for audio albums
                             output_folder: preload
