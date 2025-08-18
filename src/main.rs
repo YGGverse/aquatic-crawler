@@ -186,7 +186,7 @@ async fn main() -> Result<()> {
                             )
                             .await
                             {
-                                log::debug!(
+                                log::info!(
                                     "skip awaiting the completion of preload `{h}` data (`{e}`), ban until {}.",
                                     ban.add(i)
                                 );
@@ -206,22 +206,22 @@ async fn main() -> Result<()> {
                             session
                                 .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                 .await?; // torrent data was moved on commit; there's no sense in keeping it
-                            log::debug!("torrent `{h}` resolved.")
+                            log::info!("torrent `{h}` resolved.")
                         }
                         Ok(_) => panic!(),
-                        Err(e) => log::debug!(
+                        Err(e) => log::info!(
                             "failed to resolve torrent `{h}`: `{e}`, ban until {}.",
                             ban.add(i)
                         ),
                     },
-                    Err(e) => log::debug!(
+                    Err(e) => log::info!(
                         "skip awaiting the completion of adding torrent `{h}` data (`{e}`), ban until {}.",
                         ban.add(i)
                     ),
                 }
             }
         }
-        log::debug!(
+        log::info!(
             "queue completed at {time_queue} (time: {} / uptime: {} / banned: {}) await {} seconds to continue...",
             Local::now()
                 .signed_duration_since(time_queue)
