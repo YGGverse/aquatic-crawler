@@ -205,7 +205,7 @@ async fn main() -> Result<()> {
                             log::info!("torrent `{h}` resolved.")
                         }
                         Ok(_) => panic!(),
-                        Err(e) => log::info!(
+                        Err(e) => log::warn!(
                             "failed to resolve torrent `{h}`: `{e}`, ban until {}.",
                             ban.add(i)
                         ),
