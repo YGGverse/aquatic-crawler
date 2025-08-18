@@ -1,10 +1,8 @@
 mod api;
-mod ban;
 mod config;
 mod preload;
 
 use anyhow::Result;
-use ban::Ban;
 use config::Config;
 use librqbit::{
     AddTorrent, AddTorrentOptions, AddTorrentResponse, ConnectionOptions, SessionOptions,
@@ -63,18 +61,11 @@ async fn main() -> Result<()> {
         },
     )
     .await?;
-    let mut ban = Ban::init(config.timeout, config.index_capacity);
+    let mut ban = HashSet::with_capacity(config.index_capacity);
     log::info!("crawler started at {time_init}");
     loop {
         let time_queue = Local::now();
         log::debug!("queue crawl begin at {time_queue}...");
-        for r in ban.update(time_queue) {
-            log::debug!(
-                "remove ban for `{}` as expired on {}",
-                r.info_hash,
-                r.expires
-            )
-        }
         for source in &config.infohash {
             log::debug!("index source `{source}`...");
             // grab latest info-hashes from this source
@@ -98,14 +89,9 @@ async fn main() -> Result<()> {
                     log::debug!("torrent `{h}` exists, skip.");
                     continue;
                 }
-                if let Some(t) = ban.get(&i) {
-                    log::debug!(
-                        "torrent `{h}` banned {}, skip for this queue.",
-                        match t {
-                            Some(v) => format!("until {v}"),
-                            None => "permanently".into(),
-                        }
-                    );
+                // skip banned entry, remove it from the ban list to retry on the next iteration
+                if ban.remove(&i) {
+                    log::debug!("torrent `{h}` is banned, skip for this queue.");
                     continue;
                 }
                 log::info!("resolve `{h}`...");
@@ -197,12 +183,9 @@ async fn main() -> Result<()> {
                             .await
                             {
                                 log::info!(
-                                    "skip awaiting the completion of preload torrent data for `{h}` (`{e}`), ban {}.",
-                                    match ban.add(i, false) {
-                                        Some(t) => format!("until {t}"),
-                                        None => "permanently".into(), // @TODO feature, do not unwrap
-                                    }
+                                    "skip awaiting the completion of preload torrent data for `{h}` (`{e}`), ban for the next queue.",
                                 );
+                                assert!(ban.insert(i));
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
                                     .await?; // * do not collect billions of slow torrents in the session pool
@@ -222,21 +205,19 @@ async fn main() -> Result<()> {
                             log::info!("torrent `{h}` resolved.")
                         }
                         Ok(_) => panic!(),
-                        Err(e) => log::warn!(
-                            "failed to resolve torrent `{h}`: `{e}`, ban {}.",
-                            match ban.add(i, false) {
-                                Some(t) => format!("until {t}"),
-                                None => "permanently".into(), // @TODO feature, do not unwrap
-                            }
-                        ),
-                    },
-                    Err(e) => log::info!(
-                        "skip awaiting the completion of adding torrent `{h}` (`{e}`), ban {}.",
-                        match ban.add(i, false) {
-                            Some(t) => format!("until {t}"),
-                            None => "permanently".into(), // @TODO feature, do not unwrap
+                        Err(e) => {
+                            log::warn!(
+                                "failed to resolve torrent `{h}`: `{e}`, ban for the next queue."
+                            );
+                            assert!(ban.insert(i))
                         }
-                    ),
+                    },
+                    Err(e) => {
+                        log::info!(
+                            "skip awaiting the completion of adding torrent `{h}` (`{e}`), ban for the next queue."
+                        );
+                        assert!(ban.insert(i))
+                    }
                 }
             }
         }
@@ -248,7 +229,7 @@ async fn main() -> Result<()> {
             Local::now()
                 .signed_duration_since(time_init)
                 .as_seconds_f32(),
-            ban.total(),
+            ban.len(),
             config.sleep
         );
         std::thread::sleep(Duration::from_secs(config.sleep))
