@@ -20,9 +20,9 @@ async fn main() -> Result<()> {
     use tokio::time;
     // debug
     if std::env::var("RUST_LOG").is_ok() {
-        use tracing_subscriber::fmt::{time::FormatTime, *};
+        use tracing_subscriber::fmt::*;
         struct T;
-        impl FormatTime for T {
+        impl time::FormatTime for T {
             fn format_time(&self, w: &mut format::Writer<'_>) -> std::fmt::Result {
                 write!(w, "{}", Local::now())
             }
