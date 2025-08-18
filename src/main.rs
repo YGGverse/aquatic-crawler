@@ -90,7 +90,16 @@ async fn main() -> Result<()> {
         }
 
         // clean up nonexistent ban entries from the memory pool
-        ban.retain(|i| queue.contains(i));
+        ban.retain(|i| {
+            let is_keep = queue.contains(i);
+            if !is_keep {
+                log::debug!(
+                    "remove `{}` from the ban list, as it is no longer available in the source.",
+                    i.as_string()
+                )
+            }
+            is_keep
+        });
 
         // handle
         log::debug!(
