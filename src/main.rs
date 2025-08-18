@@ -101,7 +101,7 @@ async fn main() -> Result<()> {
                     );
                     continue;
                 }
-                log::debug!("index `{h}`...");
+                log::info!("resolve `{h}`...");
                 // run the crawler in single thread for performance reasons,
                 // use `timeout` argument option to skip the dead connections.
                 match time::timeout(
