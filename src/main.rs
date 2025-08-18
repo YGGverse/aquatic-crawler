@@ -92,7 +92,13 @@ async fn main() -> Result<()> {
                     continue;
                 }
                 if let Some(t) = ban.get(&i) {
-                    log::debug!("torrent `{h}` is banned until {t}, skip for this queue.");
+                    log::debug!(
+                        "torrent `{h}` banned {}, skip for this queue.",
+                        match t {
+                            Some(v) => format!("until {v}"),
+                            None => "permanently".into(),
+                        }
+                    );
                     continue;
                 }
                 log::debug!("index `{h}`...");
@@ -184,8 +190,11 @@ async fn main() -> Result<()> {
                             .await
                             {
                                 log::info!(
-                                    "skip awaiting the completion of preload `{h}` data (`{e}`), ban until {}.",
-                                    ban.add(i)
+                                    "skip awaiting the completion of preload `{h}` data (`{e}`), ban {}.",
+                                    match ban.add(i, false) {
+                                        Some(t) => format!("until {t}"),
+                                        None => "permanently".into(), // @TODO feature, do not unwrap
+                                    }
                                 );
                                 session
                                     .delete(librqbit::api::TorrentIdOrHash::Id(id), false)
@@ -207,13 +216,19 @@ async fn main() -> Result<()> {
                         }
                         Ok(_) => panic!(),
                         Err(e) => log::warn!(
-                            "failed to resolve torrent `{h}`: `{e}`, ban until {}.",
-                            ban.add(i)
+                            "failed to resolve torrent `{h}`: `{e}`, ban {}.",
+                            match ban.add(i, false) {
+                                Some(t) => format!("until {t}"),
+                                None => "permanently".into(), // @TODO feature, do not unwrap
+                            }
                         ),
                     },
                     Err(e) => log::info!(
-                        "skip awaiting the completion of adding torrent `{h}` data (`{e}`), ban until {}.",
-                        ban.add(i)
+                        "skip awaiting the completion of adding torrent `{h}` data (`{e}`), ban {}.",
+                        match ban.add(i, false) {
+                            Some(t) => format!("until {t}"),
+                            None => "permanently".into(), // @TODO feature, do not unwrap
+                        }
                     ),
                 }
             }
