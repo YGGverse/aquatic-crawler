@@ -89,6 +89,9 @@ async fn main() -> Result<()> {
             }
         }
 
+        // clean up nonexistent ban entries from the memory pool
+        ban.retain(|i| queue.contains(i));
+
         // handle
         log::debug!(
             "fetched {} unique hashes from {} source, banned: {}.",
