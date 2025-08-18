@@ -18,10 +18,17 @@ async fn main() -> Result<()> {
     use chrono::Local;
     use clap::Parser;
     use tokio::time;
-    // init debug
+    // debug
     if std::env::var("RUST_LOG").is_ok() {
-        tracing_subscriber::fmt::init()
-    } // librqbit
+        use tracing_subscriber::fmt::{time::FormatTime, *};
+        struct T;
+        impl FormatTime for T {
+            fn format_time(&self, w: &mut format::Writer<'_>) -> std::fmt::Result {
+                write!(w, "{}", Local::now())
+            }
+        }
+        fmt().with_timer(T).init()
+    }
     // init components
     let time_init = Local::now();
     let config = Config::parse();
