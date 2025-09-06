@@ -46,8 +46,8 @@ async fn main() -> Result<()> {
         // Please, note:
         // * it's important to start new `Session` inside the crawler loop:
         //   https://github.com/ikatson/rqbit/issues/481
-        // * on fix and starting it once (outside),
-        //   remove each torrent after resolve with `session.delete`, to prevent impl panic
+        // * when fix and after starting it once (outside the loop),
+        //   remove also each torrent after resolve it with `session.delete`, to prevent impl panic (see `single-session` branch)
         let session = Session::new_with_opts(
             preload.root().clone(),
             SessionOptions {
