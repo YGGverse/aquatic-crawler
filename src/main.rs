@@ -1,20 +1,19 @@
 mod api;
 mod config;
-mod preload;
 
 use anyhow::Result;
-use config::Config;
 use librqbit::{
     AddTorrent, AddTorrentOptions, AddTorrentResponse, ConnectionOptions, Session, SessionOptions,
 };
-use preload::Preload;
 use std::{collections::HashSet, num::NonZero, time::Duration};
 use url::Url;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    use btracker_fs::crawler::Storage;
     use chrono::Local;
     use clap::Parser;
+    use config::Config;
     use tokio::time;
     // debug
     if std::env::var("RUST_LOG").is_ok() {
@@ -30,12 +29,13 @@ async fn main() -> Result<()> {
     // init components
     let time_init = Local::now();
     let config = Config::parse();
-    let preload = Preload::init(
+    let preload = Storage::init(
         config.preload,
         config.preload_regex,
         config.preload_max_filecount,
         config.preload_max_filesize,
-    )?;
+    )
+    .unwrap();
 
     let mut ban = HashSet::with_capacity(config.index_capacity);
     log::info!("crawler started at {time_init}");

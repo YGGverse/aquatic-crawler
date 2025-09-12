@@ -12,6 +12,7 @@ repository = "https://github.com/YGGverse/aquatic-crawler"
 
 [dependencies]
 anyhow = "1.0"
+btracker-fs = { version = "0.3", features = ["crawler"] }
 chrono = "0.4.41"
 clap = { version = "4.5", features = ["derive"] }
 librqbit = {version = "9.0.0-beta.1", features = ["disable-upload"]}
@@ -23,5 +24,8 @@ url = "2.5"
 urlencoding = "2.1"
 
 [patch.crates-io]
+btracker-fs = { git = "https://github.com/yggverse/btracker-fs.git" }
+#btracker-fs = { path = "../btracker-fs" }
+
 librqbit = { git = "https://github.com/ikatson/rqbit.git", rev="b580a9610ae7c6eaacd305a3905f7e2d3202ca69", package = "librqbit" }
 #librqbit = { version = "9.0.0-beta.1", path = "../../rqbit/crates/librqbit", package = "librqbit" }
