@@ -24,7 +24,10 @@ async fn main() -> Result<()> {
                 write!(w, "{}", Local::now())
             }
         }
-        fmt().with_timer(T).with_env_filter(EnvFilter::from_default_env()).init()
+        fmt()
+            .with_timer(T)
+            .with_env_filter(EnvFilter::from_default_env())
+            .init()
     }
     // init components
     let time_init = Local::now();
