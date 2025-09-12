@@ -45,7 +45,7 @@ aquatic-crawler --infohash /path/to/info-hash-ipv4.bin\
                 --preload  /path/to/directory\
                 --preload-max-filesize=50000\
                 --preload-max-filecount=10\
-                --preload-regex="\.(png|gif|jpeg|jpg|webp|svg|log|txt)$"
+                --preload-regex="\.(png|gif|jpeg|jpg|webp|svg|log|nfo|txt)$"
 ```
 
 ### Options
