@@ -25,8 +25,8 @@ async fn main() -> Result<()> {
             }
         }
         fmt()
-            .with_timer(T)
             .with_env_filter(EnvFilter::from_default_env())
+            .with_timer(T)
             .init()
     }
     // init components
