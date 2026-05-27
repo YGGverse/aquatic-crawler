@@ -14,6 +14,7 @@ async fn main() -> Result<()> {
     use chrono::Local;
     use clap::Parser;
     use config::Config;
+    use log::*;
     use tokio::time;
     // debug
     if std::env::var("RUST_LOG").is_ok() {
@@ -41,10 +42,10 @@ async fn main() -> Result<()> {
     .unwrap();
 
     let mut ban = HashSet::with_capacity(config.index_capacity);
-    log::info!("crawler started at {time_init}");
+    info!("crawler started at {time_init}");
     loop {
         let time_queue = Local::now();
-        log::debug!("queue crawl begin at {time_queue}...");
+        debug!("queue crawl begin at {time_queue}...");
 
         // Please, note:
         // * it's important to start new `Session` inside the crawler loop:
@@ -81,18 +82,16 @@ async fn main() -> Result<()> {
         // build unique ID index from the multiple info-hash sources
         let mut queue = HashSet::with_capacity(config.index_capacity);
         for source in &config.infohash {
-            log::debug!("index source `{source}`...");
+            debug!("index source `{source}`...");
             // grab latest info-hashes from this source
             // * aquatic server may update the stats at this moment, handle result manually
-            for i in match api::get(source, config.index_capacity) {
-                Some(i) => {
-                    log::debug!("fetch `{}` hashes from `{source}`...", i.len());
+            for i in match api::get(source, config.index_capacity).await {
+                Ok(i) => {
+                    debug!("fetch `{}` hashes from `{source}`...", i.len());
                     i
                 }
-                None => {
-                    log::warn!(
-                        "the feed `{source}` has an incomplete format (or is still updating); skip."
-                    );
+                Err(e) => {
+                    warn!("the feed `{source}` update failed: `{e}`; skip.");
                     continue; // skip without panic
                 }
             } {
@@ -104,7 +103,7 @@ async fn main() -> Result<()> {
         ban.retain(|i| {
             let is_retain = queue.contains(i);
             if !is_retain {
-                log::debug!(
+                debug!(
                     "remove `{}` from the ban list, as it is no longer available in the source.",
                     i.as_string()
                 )
@@ -113,7 +112,7 @@ async fn main() -> Result<()> {
         });
 
         // handle
-        log::debug!(
+        debug!(
             "fetched {} unique hashes from {} source, banned: {}.",
             queue.len(),
             config.infohash.len(),
@@ -123,15 +122,15 @@ async fn main() -> Result<()> {
             // convert to string once
             let h = i.as_string();
             if preload.contains_torrent(&h)? {
-                log::debug!("torrent `{h}` exists, skip.");
+                debug!("torrent `{h}` exists, skip.");
                 continue;
             }
             // skip banned entry, remove it from the ban list to retry on the next iteration
             if ban.remove(&i) {
-                log::debug!("torrent `{h}` is banned, skip for this queue.");
+                debug!("torrent `{h}` is banned, skip for this queue.");
                 continue;
             }
-            log::info!("resolve `{h}`...");
+            info!("resolve `{h}`...");
             // run the crawler in single thread for performance reasons,
             // use `timeout` argument option to skip the dead connections.
             match time::timeout(
@@ -176,7 +175,7 @@ async fn main() -> Result<()> {
                                         .max_filecount
                                         .is_some_and(|limit| only_files.len() + 1 > limit)
                                     {
-                                        log::debug!(
+                                        debug!(
                                             "file count limit ({}) reached, skip file `{id}` for `{h}` at `{}` (and other files after it)",
                                             only_files.len(),
                                             info.relative_filename.to_string_lossy()
@@ -184,7 +183,7 @@ async fn main() -> Result<()> {
                                         break;
                                     }
                                     if preload.max_filesize.is_some_and(|limit| info.len > limit) {
-                                        log::debug!(
+                                        debug!(
                                             "file size ({}) limit reached, skip file `{id}` for `{h}` at `{}`",
                                             info.len,
                                             info.relative_filename.to_string_lossy()
@@ -194,11 +193,11 @@ async fn main() -> Result<()> {
                                     if preload.regex.as_ref().is_some_and(|r| {
                                         !r.is_match(&info.relative_filename.to_string_lossy())
                                     }) {
-                                        log::debug!("regex filter, skip file `{id}` for `{h}` at `{}`",
+                                        debug!("regex filter, skip file `{id}` for `{h}` at `{}`",
                                         info.relative_filename.to_string_lossy());
                                         continue;
                                     }
-                                    log::debug!(
+                                    debug!(
                                         "keep file `{id}` for `{h}` as `{}`",
                                         info.relative_filename.to_string_lossy()
                                     );
@@ -209,36 +208,34 @@ async fn main() -> Result<()> {
                             })?;
                         session.update_only_files(&mt, &only_files).await?;
                         session.unpause(&mt).await?;
-                        log::debug!("begin torrent `{h}` preload...");
+                        debug!("begin torrent `{h}` preload...");
                         if let Err(e) = time::timeout(
                             Duration::from_secs(config.timeout),
                             mt.wait_until_completed(),
                         )
                         .await
                         {
-                            log::info!(
+                            info!(
                                 "skip awaiting the completion of preload torrent data for `{h}` (`{e}`), ban for the next queue.",
                             );
                             assert!(ban.insert(i));
                             continue;
                         }
-                        log::debug!("torrent `{h}` preload completed.");
+                        debug!("torrent `{h}` preload completed.");
                         // persist torrent bytes and preloaded content,
                         // cleanup tmp (see rqbit#408)
-                        log::debug!("persist torrent `{h}` with `{}` files...", keep_files.len());
+                        debug!("persist torrent `{h}` with `{}` files...", keep_files.len());
                         preload.commit(&h, bytes, Some(keep_files))?;
-                        log::info!("torrent `{h}` resolved.")
+                        info!("torrent `{h}` resolved.")
                     }
                     Ok(_) => panic!(),
                     Err(e) => {
-                        log::warn!(
-                            "failed to resolve torrent `{h}`: `{e}`, ban for the next queue."
-                        );
+                        warn!("failed to resolve torrent `{h}`: `{e}`, ban for the next queue.");
                         assert!(ban.insert(i))
                     }
                 },
                 Err(e) => {
-                    log::info!(
+                    info!(
                         "skip awaiting the completion of adding torrent `{h}` (`{e}`), ban for the next queue."
                     );
                     assert!(ban.insert(i))
@@ -248,7 +245,7 @@ async fn main() -> Result<()> {
 
         session.stop().await;
 
-        log::info!(
+        info!(
             "queue completed at {time_queue} (time: {} / uptime: {} / banned: {}) await {} seconds to continue...",
             Local::now()
                 .signed_duration_since(time_queue)

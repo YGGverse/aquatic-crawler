@@ -1,32 +1,26 @@
+use anyhow::Result;
 use librqbit::dht::Id20;
 
-/// Parse infohash from the source filepath,
-/// decode hash bytes to `InfoHash` array on success.
-///
-/// * return `None` if the `path` is not reachable
-pub fn get(path: &str, capacity: usize) -> Option<Vec<Id20>> {
-    use std::io::Read;
-    if !path.ends_with(".bin") {
-        todo!("Only sources in the `.bin` format are supported!")
-    }
-    if path.contains("://") {
-        todo!("URL source format is not supported!")
-    }
+/// Try parse info-hash from the given source,
+/// convert bytes to valid `InfoHash` v1 array on success.
+pub async fn get(source: &str, capacity: usize) -> Result<Vec<Id20>> {
     const L: usize = 20; // v1 only
-    let mut r = Vec::with_capacity(capacity);
-    let mut f = std::fs::File::open(path).ok()?;
-    loop {
-        let mut b = [0; L];
-        if f.read(&mut b).ok()? != L {
-            break;
-        }
-        r.push(Id20::from_bytes(&b).ok()?)
+    let mut i = Vec::with_capacity(capacity);
+    for c in if source.starts_with("http://") {
+        reqwest::get(source).await?.bytes().await?.into()
+    } else {
+        tokio::fs::read(source.trim_start_matches("file://")).await?
     }
-    Some(r)
+    .chunks_exact(L)
+    {
+        let b: &[u8; L] = c.try_into()?;
+        i.push(Id20::from_bytes(b)?)
+    }
+    Ok(i)
 }
 
-#[test]
-fn test() {
+#[tokio::test]
+async fn test() {
     use std::fs;
 
     #[cfg(not(any(target_os = "linux", target_os = "macos",)))]
@@ -43,9 +37,9 @@ fn test() {
     fs::write(P0, vec![]).unwrap();
     fs::write(P1, vec![1; 40]).unwrap(); // 20 + 20 bytes
 
-    assert!(get(P0, C).is_some_and(|b| b.is_empty()));
-    assert!(get(P1, C).is_some_and(|b| b.len() == 2));
-    assert!(get(P2, C).is_none());
+    assert!(get(P0, C).await.unwrap().is_empty());
+    assert!(get(P1, C).await.unwrap().len() == 2);
+    assert!(get(P2, C).await.is_err());
 
     fs::remove_file(P0).unwrap();
     fs::remove_file(P1).unwrap();
