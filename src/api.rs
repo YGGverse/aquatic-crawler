@@ -13,8 +13,7 @@ pub async fn get(source: &str, capacity: usize) -> Result<Vec<Id20>> {
     }
     .chunks_exact(L)
     {
-        let b: &[u8; L] = c.try_into()?;
-        i.push(Id20::from_bytes(b)?)
+        i.push(Id20::from_bytes(c)?)
     }
     Ok(i)
 }
