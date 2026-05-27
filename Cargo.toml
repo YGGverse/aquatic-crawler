@@ -11,21 +11,21 @@ repository = "https://github.com/YGGverse/aquatic-crawler"
 # homepage = "https://yggverse.github.io"
 
 [dependencies]
-anyhow = "1.0"
-btracker-fs = { version = "0.3", features = ["crawler"] }
-chrono = "0.4.41"
-clap = { version = "4.5", features = ["derive"] }
-librqbit = {version = "9.0.0-beta.1", features = ["disable-upload"]}
-log = "0.4"
-regex = "1.11"
-tokio = { version = "1.45", features = ["full"] }
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-url = "2.5"
-urlencoding = "2.1"
+anyhow = "1.0.102"
+btracker-fs = { version = "0.3.1", features = ["crawler"] }
+chrono = "0.4.44"
+clap = { version = "4.6.1", features = ["derive"] }
+librqbit = { version = "9.0.0-beta.1", features = ["disable-upload"]}
+log = "0.4.30"
+regex = "1.12.3"
+tokio = { version = "1.52.3", features = ["full"] }
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+url = "2.5.8"
+urlencoding = "2.1.3"
 
 [patch.crates-io]
 #btracker-fs = { git = "https://github.com/yggverse/btracker-fs.git" }
 #btracker-fs = { path = "../btracker-fs" }
 
-librqbit = { git = "https://github.com/ikatson/rqbit.git", rev="b580a9610ae7c6eaacd305a3905f7e2d3202ca69", package = "librqbit" }
+librqbit = { git = "https://github.com/ikatson/rqbit.git", rev="61e189a9b37ab3ba678efa66586c2c1aabeed584", package = "librqbit" }
 #librqbit = { version = "9.0.0-beta.1", path = "../../rqbit/crates/librqbit", package = "librqbit" }
