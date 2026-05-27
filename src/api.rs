@@ -4,16 +4,15 @@ use librqbit::dht::Id20;
 /// Try parse info-hash from the given source,
 /// convert bytes to valid `InfoHash` v1 array on success.
 pub async fn get(source: &str, capacity: usize) -> Result<Vec<Id20>> {
-    const L: usize = 20; // v1 only
     let mut i = Vec::with_capacity(capacity);
     for c in if source.starts_with("http://") {
         reqwest::get(source).await?.bytes().await?.into()
     } else {
         tokio::fs::read(source.trim_start_matches("file://")).await?
     }
-    .chunks_exact(L)
+    .chunks_exact(20)
     {
-        i.push(Id20::from_bytes(c)?)
+        i.push(Id20::from_bytes(c)?) // v1 only
     }
     Ok(i)
 }
