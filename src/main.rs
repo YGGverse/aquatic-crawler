@@ -1,5 +1,5 @@
-mod api;
 mod config;
+mod full_scrape;
 
 use anyhow::Result;
 use librqbit::{
@@ -81,11 +81,11 @@ async fn main() -> Result<()> {
 
         // build unique ID index from the multiple info-hash sources
         let mut queue = HashSet::with_capacity(config.index_capacity);
-        for source in &config.infohash {
+        for source in &config.full_scrape {
             debug!("index source `{source}`...");
             // grab latest info-hashes from this source
             // * aquatic server may update the stats at this moment, handle result manually
-            for i in match api::get(source, config.index_capacity).await {
+            for i in match full_scrape::get(source, config.index_capacity).await {
                 Ok(i) => {
                     debug!("fetch `{}` hashes from `{source}`...", i.len());
                     i
@@ -115,7 +115,7 @@ async fn main() -> Result<()> {
         debug!(
             "fetched {} unique hashes from {} source, banned: {}.",
             queue.len(),
-            config.infohash.len(),
+            config.full_scrape.len(),
             ban.len()
         );
         for i in queue {

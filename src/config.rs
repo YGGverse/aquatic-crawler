@@ -9,14 +9,12 @@ pub struct Config {
     /// Directory path to store preloaded data (e.g. `.torrent` files)
     ///
     /// * it's probably the same location as `public` dir for the [btracker](https://github.com/YGGverse/btracker) frontend
-    #[arg(long)]
+    #[arg(long, short)]
     pub preload: PathBuf,
 
-    /// Absolute path(s) or URL(s) to import infohashes from the Aquatic tracker binary API
-    ///
-    /// * PR#233 feature ([Wiki](https://github.com/YGGverse/aquatic-crawler/wiki/Aquatic))
-    #[arg(long)]
-    pub infohash: Vec<String>,
+    /// Absolute path(s) or URL(s) to the BEP 48 / Full Scrape
+    #[arg(long, short)]
+    pub full_scrape: Vec<String>,
 
     /// The P2P Blocklist file URL (to filter outgoing connections)
     ///
@@ -25,7 +23,7 @@ pub struct Config {
     pub blocklist: Option<Url>,
 
     /// Define custom tracker(s) to preload the `.torrent` files info
-    #[arg(long)]
+    #[arg(long, short)]
     pub tracker: Vec<Url>,
 
     /// Define initial peer(s) to preload the `.torrent` files info
