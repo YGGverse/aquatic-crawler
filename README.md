@@ -1,5 +1,8 @@
 # aquatic-crawler
 
+> [!INFO]
+> Archived, use [btracker-crawler](https://github.com/YGGverse/btracker/tree/main/crates/crawler) instead.
+
 ![Build](https://github.com/YGGverse/aquatic-crawler/actions/workflows/build.yml/badge.svg)
 [![Dependencies](https://deps.rs/repo/github/YGGverse/aquatic-crawler/status.svg)](https://deps.rs/repo/github/YGGverse/aquatic-crawler)
 [![crates.io](https://img.shields.io/crates/v/aquatic-crawler.svg)](https://crates.io/crates/aquatic-crawler)
