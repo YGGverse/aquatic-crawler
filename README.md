@@ -1,6 +1,6 @@
 # aquatic-crawler
 
-> [!IMPORTANT]
+> [!WARNING]
 > Archived, use [btracker-crawler](https://github.com/YGGverse/btracker/tree/main/crates/crawler) instead.
 
 ![Build](https://github.com/YGGverse/aquatic-crawler/actions/workflows/build.yml/badge.svg)
